@@ -101,6 +101,22 @@
   z-index: 1;
 }
 
+.progress-step.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.progress-step.clickable:hover {
+  transform: translateY(-2px);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.progress-step.active-step {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
 .step-circle {
   width: 2rem;
   height: 2rem;

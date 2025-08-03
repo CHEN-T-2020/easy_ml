@@ -87,7 +87,12 @@ function App() {
           <p className="text-gray-600">学习识别诱导性标题，培养媒体素养</p>
         </header>
 
-        <ProgressBar currentStep={currentStep} totalSteps={3} steps={steps} />
+        <ProgressBar 
+          currentStep={currentStep} 
+          totalSteps={3} 
+          steps={steps} 
+          onStepClick={setCurrentStep}
+        />
 
         {currentStep === 0 && (
           <div className="space-y-6">
@@ -152,12 +157,21 @@ function App() {
             </div>
 
             <div className="text-center">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">
+                  当前样本: {realSamples.length} 条正常标题, {fakeSamples.length} 条标题党
+                </p>
+                {!canProceed && (
+                  <p className="text-sm text-amber-600">
+                    建议至少添加 {Math.max(0, 3 - realSamples.length)} 条正常标题和 {Math.max(0, 3 - fakeSamples.length)} 条标题党以获得更好的训练效果
+                  </p>
+                )}
+              </div>
               <button
                 onClick={() => setCurrentStep(1)}
-                disabled={!canProceed}
-                className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+                className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
               >
-                {canProceed ? '下一步：训练模型' : `还需要 ${Math.max(0, 3 - realSamples.length)} 条正常标题和 ${Math.max(0, 3 - fakeSamples.length)} 条标题党`}
+                下一步：训练模型
               </button>
             </div>
           </div>

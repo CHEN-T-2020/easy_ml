@@ -258,6 +258,12 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
         </div>
       </div>
 
+      <div className="navigation-tip">
+        <p className="text-sm text-gray-600 text-center mb-4">
+          💡 提示：可以点击上方的步骤切换到其他功能页面
+        </p>
+      </div>
+
       {!trainingStatus.isModelTrained && trainingStatus.status === 'idle' && (
         <div className="training-tips">
           <h4 className="tips-title">💡 训练提示</h4>

@@ -232,13 +232,19 @@ export const TestingInterface: React.FC<TestingInterfaceProps> = ({ onBackToTrai
         </button>
       </div>
 
+      <div className="navigation-tip">
+        <p className="text-sm text-gray-600 text-center mb-4">
+          💡 提示：可以点击上方的步骤切换到其他功能页面
+        </p>
+      </div>
+
       <div className="testing-tips">
         <h4 className="tips-title">💡 使用提示</h4>
         <ul className="tips-list">
           <li>输入各种类型的标题来测试模型的识别能力</li>
           <li>观察特征分析结果，了解模型的判断依据</li>
           <li>置信度反映模型对判断结果的确信程度</li>
-          <li>如果预测结果不准确，可以返回训练页面添加更多样本</li>
+          <li>如果预测结果不准确，可以点击上方"收集数据"添加更多样本</li>
         </ul>
       </div>
     </div>
