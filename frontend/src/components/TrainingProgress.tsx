@@ -14,11 +14,17 @@ interface TrainingMetrics {
 interface TrainingProgressProps {
   onTrainingComplete: (metrics: TrainingMetrics) => void;
   onStartTesting: () => void;
+  realSamplesCount: number;
+  fakeSamplesCount: number;
+  onGoToDataCollection: () => void;
 }
 
 export const TrainingProgress: React.FC<TrainingProgressProps> = ({ 
   onTrainingComplete, 
-  onStartTesting 
+  onStartTesting,
+  realSamplesCount,
+  fakeSamplesCount,
+  onGoToDataCollection
 }) => {
   const [trainingStatus, setTrainingStatus] = useState<{
     status: 'idle' | 'training' | 'completed' | 'error';
@@ -35,6 +41,10 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
   });
 
   const [isPolling, setIsPolling] = useState(false);
+
+  // 检查是否有足够的数据进行训练
+  const canTrain = realSamplesCount >= 3 && fakeSamplesCount >= 3;
+  const totalSamples = realSamplesCount + fakeSamplesCount;
 
   // 检查训练状态
   const checkTrainingStatus = async () => {
@@ -150,21 +160,55 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
         <p className="text-gray-600">使用收集的数据训练标题党识别模型</p>
       </div>
 
-      <div className="training-card">
-        <div className="training-header">
-          <div className="status-icon">{getStatusIcon()}</div>
+      {/* 数据状态检查 */}
+      <div className="data-status-card">
+        <div className="data-status-header">
+          <div className="status-icon">📊</div>
           <div className="status-text">
-            <h3 className={`status-title ${getStatusColor()}`}>
-              {trainingStatus.status === 'idle' && '准备开始训练'}
-              {trainingStatus.status === 'training' && '正在训练模型...'}
-              {trainingStatus.status === 'completed' && '训练完成'}
-              {trainingStatus.status === 'error' && '训练失败'}
-            </h3>
-            {trainingStatus.message && (
-              <p className="status-message">{trainingStatus.message}</p>
-            )}
+            <h3 className="status-title text-gray-800">训练数据状态</h3>
+            <p className="status-message">
+              当前样本: {realSamplesCount} 条正常标题, {fakeSamplesCount} 条标题党 (共 {totalSamples} 条)
+            </p>
           </div>
         </div>
+        
+        {!canTrain && (
+          <div className="data-insufficient-warning">
+            <div className="warning-content">
+              <div className="warning-icon">⚠️</div>
+              <div className="warning-text">
+                <h4 className="warning-title">数据不足，无法开始训练</h4>
+                <p className="warning-message">
+                  至少需要 {Math.max(0, 3 - realSamplesCount)} 条正常标题和 {Math.max(0, 3 - fakeSamplesCount)} 条标题党样本
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onGoToDataCollection}
+              className="action-button primary"
+            >
+              前往收集数据
+            </button>
+          </div>
+        )}
+      </div>
+
+      {canTrain && (
+        <div className="training-card">
+          <div className="training-header">
+            <div className="status-icon">{getStatusIcon()}</div>
+            <div className="status-text">
+              <h3 className={`status-title ${getStatusColor()}`}>
+                {trainingStatus.status === 'idle' && '准备开始训练'}
+                {trainingStatus.status === 'training' && '正在训练模型...'}
+                {trainingStatus.status === 'completed' && '训练完成'}
+                {trainingStatus.status === 'error' && '训练失败'}
+              </h3>
+              {trainingStatus.message && (
+                <p className="status-message">{trainingStatus.message}</p>
+              )}
+            </div>
+          </div>
 
         {trainingStatus.status === 'training' && (
           <div className="progress-section">
@@ -256,7 +300,8 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       <div className="navigation-tip">
         <p className="text-sm text-gray-600 text-center mb-4">

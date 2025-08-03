@@ -186,6 +186,11 @@ function App() {
             onStartTesting={() => {
               setCurrentStep(2);
             }}
+            realSamplesCount={realSamples.length}
+            fakeSamplesCount={fakeSamples.length}
+            onGoToDataCollection={() => {
+              setCurrentStep(0);
+            }}
           />
         )}
 
