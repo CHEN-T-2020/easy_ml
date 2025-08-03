@@ -1,27 +1,15 @@
 import { TextFeatureExtractor, TextFeatures } from './TextFeatureExtractor';
+import { 
+  BaseClassifier, 
+  TrainingData, 
+  ClassificationResult, 
+  TrainingMetrics, 
+  ModelInfo,
+  TrainingProgress 
+} from './BaseClassifier';
 
-export interface TrainingData {
-  text: string;
-  label: 'real' | 'fake';
-}
-
-export interface ClassificationResult {
-  prediction: 'real' | 'fake';
-  confidence: number;
-  features: TextFeatures;
-  reasoning: string[];
-}
-
-export interface TrainingMetrics {
-  accuracy: number;
-  precision: number;
-  recall: number;
-  f1Score: number;
-}
-
-export class ClickbaitClassifier {
+export class ClickbaitClassifier extends BaseClassifier {
   private featureExtractor: TextFeatureExtractor;
-  private isTrained: boolean = false;
   
   // 朴素贝叶斯参数
   private realMeans: number[] = [];
@@ -39,13 +27,40 @@ export class ClickbaitClassifier {
   ];
 
   constructor() {
+    super();
     this.featureExtractor = new TextFeatureExtractor();
+  }
+
+  getModelInfo(): ModelInfo {
+    return {
+      name: '朴素贝叶斯分类器',
+      type: 'traditional',
+      description: '基于贝叶斯定理的概率分类方法，假设特征间相互独立',
+      advantages: [
+        '训练速度快，实现简单',
+        '对小数据集表现良好',
+        '具有较好的可解释性',
+        '对噪声数据不敏感',
+        '支持增量学习'
+      ],
+      disadvantages: [
+        '假设特征独立，现实中往往不成立',
+        '对特征缺失敏感',
+        '分类性能有限',
+        '需要平滑处理零概率'
+      ],
+      complexity: 'low'
+    };
   }
 
   /**
    * 训练分类器
    */
-  async train(trainingData: TrainingData[]): Promise<TrainingMetrics> {
+  async train(
+    trainingData: TrainingData[], 
+    onProgress?: (progress: TrainingProgress) => void
+  ): Promise<TrainingMetrics> {
+    this.trainingStartTime = Date.now();
     if (trainingData.length < 4) {
       throw new Error('训练数据不足，至少需要4个样本（每类至少2个）');
     }
@@ -59,10 +74,24 @@ export class ClickbaitClassifier {
     }
 
     // 训练TF-IDF
+    onProgress?.({
+      stage: 'feature_extraction',
+      progress: 20,
+      message: '正在提取文本特征...',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
+
     const allTexts = trainingData.map(d => d.text);
     this.featureExtractor.trainTfIdf(allTexts);
 
     // 提取特征
+    onProgress?.({
+      stage: 'training_model',
+      progress: 60,
+      message: '正在训练朴素贝叶斯模型...',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
+
     const realFeatures = realData.map(d => 
       this.featureExtractor.getFeatureVector(
         this.featureExtractor.extractFeatures(d.text)
@@ -87,7 +116,24 @@ export class ClickbaitClassifier {
     this.isTrained = true;
 
     // 计算交叉验证指标
-    return this.evaluateModel(trainingData);
+    onProgress?.({
+      stage: 'evaluation',
+      progress: 90,
+      message: '正在评估模型性能...',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
+
+    const metrics = this.evaluateOnData(this, trainingData);
+    metrics.trainingTime = Date.now() - this.trainingStartTime;
+
+    onProgress?.({
+      stage: 'completed',
+      progress: 100,
+      message: '朴素贝叶斯训练完成',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
+
+    return metrics;
   }
 
   /**
@@ -98,6 +144,7 @@ export class ClickbaitClassifier {
       throw new Error('模型尚未训练，请先调用train()方法');
     }
 
+    const startTime = Date.now();
     const features = this.featureExtractor.extractFeatures(text);
     const featureVector = this.featureExtractor.getFeatureVector(features);
 
@@ -119,12 +166,14 @@ export class ClickbaitClassifier {
 
     // 生成解释
     const reasoning = this.generateReasoning(features, featureVector, prediction);
+    const processingTime = Date.now() - startTime;
 
     return {
       prediction,
       confidence,
       features,
-      reasoning
+      reasoning,
+      processingTime
     };
   }
 
@@ -233,42 +282,64 @@ export class ClickbaitClassifier {
   }
 
   /**
-   * 评估模型性能
+   * 获取特征重要性分析
    */
-  private evaluateModel(testData: TrainingData[]): TrainingMetrics {
-    let correct = 0;
-    let truePositives = 0;
-    let falsePositives = 0;
-    let falseNegatives = 0;
-
-    for (const sample of testData) {
-      const result = this.predict(sample.text);
-      const predicted = result.prediction;
-      const actual = sample.label;
-
-      if (predicted === actual) {
-        correct++;
-      }
-
-      if (predicted === 'fake' && actual === 'fake') {
-        truePositives++;
-      } else if (predicted === 'fake' && actual === 'real') {
-        falsePositives++;
-      } else if (predicted === 'real' && actual === 'fake') {
-        falseNegatives++;
-      }
+  getFeatureImportance(): { feature: string; importance: number }[] {
+    if (!this.isTrained) {
+      return [];
     }
 
-    const accuracy = correct / testData.length;
-    const precision = truePositives / (truePositives + falsePositives) || 0;
-    const recall = truePositives / (truePositives + falseNegatives) || 0;
-    const f1Score = 2 * (precision * recall) / (precision + recall) || 0;
+    // 基于均值差异计算特征重要性
+    const importances: { feature: string; importance: number }[] = [];
+    
+    for (let i = 0; i < this.featureNames.length && i < this.realMeans.length; i++) {
+      const realMean = this.realMeans[i] || 0;
+      const fakeMean = this.fakeMeans[i] || 0;
+      const importance = Math.abs(realMean - fakeMean);
+      
+      importances.push({
+        feature: this.featureNames[i],
+        importance
+      });
+    }
+    
+    return importances.sort((a, b) => b.importance - a.importance);
+  }
 
+  /**
+   * 解释预测结果
+   */
+  explainPrediction(text: string): {
+    prediction: ClassificationResult;
+    explanation: string[];
+    visualData: any;
+  } {
+    const prediction = this.predict(text);
+    
+    const explanation = [
+      '朴素贝叶斯基于特征独立性假设进行分类',
+      `实际概率: ${((1 - prediction.confidence / 100) * 100).toFixed(1)}%`,
+      `标题党概率: ${prediction.confidence}%`,
+      `处理时间: ${prediction.processingTime}ms`
+    ];
+
+    const featureImportances = this.getFeatureImportance().slice(0, 8);
+    
     return {
-      accuracy,
-      precision,
-      recall,
-      f1Score
+      prediction,
+      explanation,
+      visualData: {
+        featureImportances,
+        probabilityDistribution: {
+          real: (1 - prediction.confidence / 100),
+          fake: prediction.confidence / 100
+        },
+        modelParameters: {
+          featureCount: this.featureNames.length,
+          realPrior: this.realPrior,
+          fakePrior: this.fakePrior
+        }
+      }
     };
   }
 

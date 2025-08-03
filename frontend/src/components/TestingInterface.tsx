@@ -19,9 +19,10 @@ interface PredictionResult {
 
 interface TestingInterfaceProps {
   onBackToTraining: () => void;
+  onGoToComparison?: () => void;
 }
 
-export const TestingInterface: React.FC<TestingInterfaceProps> = ({ onBackToTraining }) => {
+export const TestingInterface: React.FC<TestingInterfaceProps> = ({ onBackToTraining, onGoToComparison }) => {
   const [testText, setTestText] = useState('');
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -224,9 +225,17 @@ export const TestingInterface: React.FC<TestingInterfaceProps> = ({ onBackToTrai
         >
           返回训练
         </button>
+        {onGoToComparison && (
+          <button
+            onClick={onGoToComparison}
+            className="action-button primary"
+          >
+            🔍 模型对比分析
+          </button>
+        )}
         <button
           onClick={() => window.location.reload()}
-          className="action-button primary"
+          className="action-button secondary"
         >
           重新开始
         </button>

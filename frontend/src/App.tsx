@@ -5,6 +5,7 @@ import { SampleList } from './components/SampleList';
 import { FileUpload } from './components/FileUpload';
 import { TrainingProgress } from './components/TrainingProgress';
 import { TestingInterface } from './components/TestingInterface';
+import ModelComparison from './components/ModelComparison';
 import { api } from './utils/api';
 
 interface TextSample {
@@ -73,7 +74,7 @@ function App() {
   const [fakeNewsText, setFakeNewsText] = useState('');
   const [samples, setSamples] = useState<TextSample[]>([]);
 
-  const steps = ['收集数据', '训练模型', '测试识别'];
+  const steps = ['收集数据', '训练模型', '测试识别', '模型对比'];
 
   const addSample = async (content: string, label: 'real' | 'fake') => {
     if (content.length < 10) return;
@@ -177,7 +178,7 @@ function App() {
 
         <ProgressBar 
           currentStep={currentStep} 
-          totalSteps={3} 
+          totalSteps={4} 
           steps={steps} 
           onStepClick={setCurrentStep}
         />
@@ -309,7 +310,30 @@ function App() {
             onBackToTraining={() => {
               setCurrentStep(1);
             }}
+            onGoToComparison={() => {
+              setCurrentStep(3);
+            }}
           />
+        )}
+
+        {currentStep === 3 && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">模型对比分析</h2>
+              <p className="text-gray-600">比较不同机器学习模型的性能表现</p>
+            </div>
+            
+            <ModelComparison />
+            
+            <div className="text-center mt-8">
+              <button
+                onClick={() => setCurrentStep(2)}
+                className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+              >
+                返回测试界面
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

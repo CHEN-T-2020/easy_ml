@@ -129,18 +129,22 @@ export class TextFeatureExtractor {
    */
   private computeTfIdfVector(tokens: string[]): number[] {
     const vector: number[] = [];
-    const docIndex = this.tfidf.documents.length;
     
     // 临时添加文档以计算TF-IDF
     this.tfidf.addDocument(tokens);
+    const docIndex = this.tfidf.documents.length - 1; // 使用刚添加的文档索引
     
     // 获取所有术语的TF-IDF值
-    this.tfidf.listTerms(docIndex).forEach(item => {
-      vector.push(item.tfidf);
-    });
+    try {
+      this.tfidf.listTerms(docIndex).forEach(item => {
+        vector.push(item.tfidf);
+      });
+    } catch (error) {
+      console.warn('TF-IDF计算错误:', error);
+    }
     
     // 如果向量为空或长度不足，填充为固定长度
-    const targetLength = 100; // 固定向量长度
+    const targetLength = 20; // 减少向量长度以提高效率
     while (vector.length < targetLength) {
       vector.push(0);
     }
