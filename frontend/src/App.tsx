@@ -13,6 +13,24 @@ interface TextSample {
   label: 'real' | 'fake';
 }
 
+// 示例数据用于快速试用
+const SAMPLE_DATA = {
+  real: [
+    "教育部发布2024年高校招生政策调整通知",
+    "本市今日气温将达到35℃，市民需注意防暑降温",
+    "某科技公司第三季度财报显示营收增长15%",
+    "新冠疫苗接种点本周末正常开放",
+    "城市地铁2号线预计明年6月开通运营"
+  ],
+  fake: [
+    "震惊！这个方法让你30天暴瘦20斤，不看后悔一辈子！",
+    "重磅消息！某明星秘密结婚生子，真相让人不敢相信",
+    "必须转发！这个东西家家都有，竟然致癌率高达90%",
+    "速看！银行内部消息泄露，这样存钱一年多赚10万",
+    "太可怕了！这种食物吃一口等于吃10根香烟，赶紧告诉家人"
+  ]
+};
+
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [realNewsText, setRealNewsText] = useState('');
@@ -74,6 +92,40 @@ function App() {
     }
   };
 
+  // 快速试用功能：加载示例数据
+  const loadSampleData = async () => {
+    try {
+      // 加载正常标题
+      const realResponse = await api.batchUpload(SAMPLE_DATA.real, 'real');
+      if (realResponse.success && realResponse.data) {
+        const realSamples: TextSample[] = realResponse.data.samples.map(sample => ({
+          id: sample.id,
+          content: sample.content,
+          label: sample.label
+        }));
+        
+        // 加载标题党
+        const fakeResponse = await api.batchUpload(SAMPLE_DATA.fake, 'fake');
+        if (fakeResponse.success && fakeResponse.data) {
+          const fakeSamples: TextSample[] = fakeResponse.data.samples.map(sample => ({
+            id: sample.id,
+            content: sample.content,
+            label: sample.label
+          }));
+          
+          // 更新状态
+          setSamples(prevSamples => [...prevSamples, ...realSamples, ...fakeSamples]);
+          
+          // 显示成功提示
+          alert(`成功加载示例数据：${realSamples.length} 条正常标题，${fakeSamples.length} 条标题党`);
+        }
+      }
+    } catch (error) {
+      console.error('加载示例数据失败:', error);
+      alert('加载示例数据失败，请稍后重试');
+    }
+  };
+
   const realSamples = samples.filter(s => s.label === 'real');
   const fakeSamples = samples.filter(s => s.label === 'fake');
 
@@ -100,6 +152,28 @@ function App() {
               <h2 className="text-xl font-semibold text-gray-800 mb-2">收集训练数据</h2>
               <p className="text-gray-600">请添加正常标题和标题党的文本样本，至少各3条</p>
             </div>
+
+            {/* 快速试用功能 */}
+            {samples.length === 0 && (
+              <div className="quick-demo-card">
+                <div className="demo-header">
+                  <div className="demo-icon">🚀</div>
+                  <div className="demo-content">
+                    <h3 className="demo-title">快速试用</h3>
+                    <p className="demo-description">
+                      不想手动输入数据？点击下方按钮加载示例数据，立即体验完整功能
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={loadSampleData}
+                  className="demo-button"
+                >
+                  <span className="button-icon">⚡</span>
+                  加载示例数据 (5条正常标题 + 5条标题党)
+                </button>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
