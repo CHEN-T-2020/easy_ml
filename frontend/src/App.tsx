@@ -3,6 +3,8 @@ import { ProgressBar } from './components/ProgressBar';
 import { TextInput } from './components/TextInput';
 import { SampleList } from './components/SampleList';
 import { FileUpload } from './components/FileUpload';
+import { TrainingProgress } from './components/TrainingProgress';
+import { TestingInterface } from './components/TestingInterface';
 import { api } from './utils/api';
 
 interface TextSample {
@@ -162,17 +164,23 @@ function App() {
         )}
 
         {currentStep === 1 && (
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">训练模型功能开发中...</h2>
-            <p className="text-gray-600">即将实现AI模型训练功能</p>
-          </div>
+          <TrainingProgress
+            onTrainingComplete={(metrics) => {
+              console.log('训练完成:', metrics);
+              // 可以选择自动进入下一步或停留在当前步骤
+            }}
+            onStartTesting={() => {
+              setCurrentStep(2);
+            }}
+          />
         )}
 
         {currentStep === 2 && (
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">测试识别功能开发中...</h2>
-            <p className="text-gray-600">即将实现标题党识别测试功能</p>
-          </div>
+          <TestingInterface
+            onBackToTraining={() => {
+              setCurrentStep(1);
+            }}
+          />
         )}
       </div>
     </div>

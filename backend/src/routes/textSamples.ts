@@ -15,6 +15,9 @@ interface TextSample {
 let samples: TextSample[] = [];
 let nextId = 1;
 
+// 导出样本数据供ML模块使用
+export { samples };
+
 // 获取所有文本样本
 router.get('/', (req: Request, res: Response) => {
   res.json({

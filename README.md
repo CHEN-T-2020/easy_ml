@@ -157,4 +157,5 @@ curl -X POST http://localhost:3001/api/text-samples/batch \
 ## 👥 致谢
 
 - 感谢Google Teachable Machine提供的设计灵感
+- 感谢ML for kids提供的设计灵感
 - 感谢所有为媒体素养教育做出贡献的研究者
