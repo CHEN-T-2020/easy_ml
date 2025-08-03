@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/text-samples', textSamplesRouter);
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: '假新闻识别平台 API 服务已启动' });
+  res.json({ message: '标题党识别平台 API 服务已启动' });
 });
 
 app.get('/health', (req: Request, res: Response) => {

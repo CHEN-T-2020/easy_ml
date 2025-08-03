@@ -18,7 +18,7 @@ export const SampleList: React.FC<SampleListProps> = ({ samples, label, onDelete
   const [showAll, setShowAll] = useState(false);
   
   const isReal = label === 'real';
-  const labelText = isReal ? '真实新闻' : '假新闻';
+  const labelText = isReal ? '正常标题' : '标题党';
   
   // 按ID降序排列，显示最新添加的在前面
   const sortedSamples = [...samples].sort((a, b) => b.id - a.id);

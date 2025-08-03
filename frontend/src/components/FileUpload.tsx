@@ -13,7 +13,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, onFilesUploaded }
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isReal = label === 'real';
-  const labelText = isReal ? '真实新闻' : '假新闻';
+  const labelText = isReal ? '正常标题' : '标题党';
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith('.txt')) {

@@ -15,7 +15,7 @@ export const SampleCard: React.FC<SampleCardProps> = ({ content, label, onDelete
     <div className={`sample-card ${isReal ? 'real' : 'fake'}`}>
       <div className="sample-header">
         <span className={`sample-label ${isReal ? 'real' : 'fake'}`}>
-          {isReal ? '真实新闻' : '假新闻'} #{index + 1}
+          {isReal ? '正常标题' : '标题党'} #{index + 1}
         </span>
         <button
           onClick={onDelete}

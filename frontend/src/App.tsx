@@ -81,8 +81,8 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">假新闻识别训练平台</h1>
-          <p className="text-gray-600">学习识别假新闻，培养媒体素养</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">标题党识别训练平台</h1>
+          <p className="text-gray-600">学习识别诱导性标题，培养媒体素养</p>
         </header>
 
         <ProgressBar currentStep={currentStep} totalSteps={3} steps={steps} />
@@ -91,14 +91,14 @@ function App() {
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-2">收集训练数据</h2>
-              <p className="text-gray-600">请添加真实新闻和假新闻的文本样本，至少各3条</p>
+              <p className="text-gray-600">请添加正常标题和标题党的文本样本，至少各3条</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <TextInput
-                  label="真实新闻"
-                  placeholder="请输入真实、可靠的新闻内容..."
+                  label="正常标题"
+                  placeholder="请输入正常、客观的标题内容..."
                   value={realNewsText}
                   onChange={setRealNewsText}
                   onAdd={() => addSample(realNewsText, 'real')}
@@ -119,8 +119,8 @@ function App() {
 
               <div>
                 <TextInput
-                  label="假新闻"
-                  placeholder="请输入虚假、误导性的新闻内容..."
+                  label="标题党"
+                  placeholder="请输入夸张、诱导性的标题内容..."
                   value={fakeNewsText}
                   onChange={setFakeNewsText}
                   onAdd={() => addSample(fakeNewsText, 'fake')}
@@ -143,8 +143,8 @@ function App() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h4 className="text-sm font-medium text-blue-800 mb-2">💡 提示</h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>• 真实新闻通常来源可靠，语言客观，数据具体</li>
-                <li>• 假新闻常含夸张词汇，情绪化表达，缺乏具体来源</li>
+                <li>• 正常标题通常客观陈述，用词准确，不过度渲染</li>
+                <li>• 标题党常含夸张词汇，情绪化表达，诱导点击</li>
                 <li>• 建议每类至少添加5-10个样本以获得更好的训练效果</li>
               </ul>
             </div>
@@ -155,7 +155,7 @@ function App() {
                 disabled={!canProceed}
                 className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                {canProceed ? '下一步：训练模型' : `还需要 ${Math.max(0, 3 - realSamples.length)} 条真实新闻和 ${Math.max(0, 3 - fakeSamples.length)} 条假新闻`}
+                {canProceed ? '下一步：训练模型' : `还需要 ${Math.max(0, 3 - realSamples.length)} 条正常标题和 ${Math.max(0, 3 - fakeSamples.length)} 条标题党`}
               </button>
             </div>
           </div>
@@ -171,7 +171,7 @@ function App() {
         {currentStep === 2 && (
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">测试识别功能开发中...</h2>
-            <p className="text-gray-600">即将实现新闻识别测试功能</p>
+            <p className="text-gray-600">即将实现标题党识别测试功能</p>
           </div>
         )}
       </div>

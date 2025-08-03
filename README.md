@@ -1,6 +1,6 @@
-# 假新闻识别文字分类教学平台
+# 标题党识别文字分类教学平台
 
-基于Teachable Machine设计理念的假新闻识别教学平台，帮助学生通过机器学习技术学习识别假新闻。
+基于Teachable Machine设计理念的标题党识别教学平台，帮助学生通过机器学习技术学习识别诱导性标题。
 
 ![Platform Demo](https://img.shields.io/badge/Status-Development-orange)
 ![React](https://img.shields.io/badge/Frontend-React%2BTypeScript-blue)
@@ -17,7 +17,7 @@
 - **智能样本管理**：
   - 只展示最新3条样本，其他自动折叠
   - 一键展开/收起历史记录
-- **实时假新闻特征提示**
+- **实时标题党特征提示**
 - **可视化进度指示**
 - **响应式界面设计**
 
@@ -86,7 +86,7 @@ npm start
 ### 使用方法
 
 1. **收集数据阶段**：
-   - 手动输入：在文本框中输入真实新闻或假新闻内容
+   - 手动输入：在文本框中输入正常标题或标题党内容
    - 批量上传：拖拽或选择TXT文件，每行一条样本
    - 查看样本：默认显示最新3条，可展开查看全部
 
@@ -95,7 +95,7 @@ npm start
    - 实时显示训练进度
 
 3. **测试识别阶段**（开发中）：
-   - 输入新文本进行分类测试
+   - 输入新标题进行分类测试
    - 查看预测结果和置信度
 
 ## 📊 API接口
@@ -113,7 +113,7 @@ npm start
 curl -X POST http://localhost:3001/api/text-samples/batch \
   -H "Content-Type: application/json" \
   -d '{
-    "texts": ["真实新闻内容1", "真实新闻内容2"],
+    "texts": ["正常标题内容1", "正常标题内容2"],
     "label": "real"
   }'
 ```
@@ -157,4 +157,4 @@ curl -X POST http://localhost:3001/api/text-samples/batch \
 ## 👥 致谢
 
 - 感谢Google Teachable Machine提供的设计灵感
-- 感谢所有为假新闻识别教育做出贡献的研究者
+- 感谢所有为媒体素养教育做出贡献的研究者
