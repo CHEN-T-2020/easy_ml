@@ -9,7 +9,7 @@ interface ApiResponse<T = any> {
 interface TextSample {
   id: number;
   content: string;
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
   wordCount: number;
   qualityScore: number;
   createdAt: string;
@@ -18,12 +18,14 @@ interface TextSample {
 interface BatchUploadResponse {
   importedCount: number;
   skippedCount: number;
+  normalCount: number;
+  clickbaitCount: number;
   samples: TextSample[];
 }
 
 export const api = {
   // 批量上传文本样本
-  batchUpload: async (texts: string[], label: 'real' | 'fake'): Promise<ApiResponse<BatchUploadResponse>> => {
+  batchUpload: async (texts: string[], label: 'normal' | 'clickbait'): Promise<ApiResponse<BatchUploadResponse>> => {
     const response = await fetch(`${API_BASE_URL}/text-samples/batch`, {
       method: 'POST',
       headers: {
@@ -36,7 +38,7 @@ export const api = {
   },
 
   // 添加单个文本样本
-  addSample: async (content: string, label: 'real' | 'fake'): Promise<ApiResponse<TextSample>> => {
+  addSample: async (content: string, label: 'normal' | 'clickbait'): Promise<ApiResponse<TextSample>> => {
     const response = await fetch(`${API_BASE_URL}/text-samples`, {
       method: 'POST',
       headers: {
@@ -65,12 +67,53 @@ export const api = {
   // 获取统计信息
   getStats: async (): Promise<ApiResponse<{
     total: number;
-    realCount: number;
-    fakeCount: number;
+    normalCount: number;
+    clickbaitCount: number;
     averageQuality: number;
     canTrain: boolean;
   }>> => {
     const response = await fetch(`${API_BASE_URL}/text-samples/stats`);
     return response.json();
+  },
+
+  // 数据集管理API
+  dataManager: {
+    // 获取训练数据集信息
+    getTrainingDataset: async (): Promise<ApiResponse<{
+      name: string;
+      description: string;
+      totalSamples: number;
+      normalCount: number;
+      clickbaitCount: number;
+    }>> => {
+      const response = await fetch(`${API_BASE_URL}/data-manager/datasets/training`);
+      return response.json();
+    },
+
+    // 导入训练数据集到系统
+    importTrainingDataset: async (): Promise<ApiResponse<BatchUploadResponse>> => {
+      const response = await fetch(`${API_BASE_URL}/data-manager/datasets/training/import`, {
+        method: 'POST',
+      });
+      return response.json();
+    },
+
+    // 创建数据备份
+    createBackup: async (): Promise<ApiResponse<{ backupId: string }>> => {
+      const response = await fetch(`${API_BASE_URL}/data-manager/backup`, {
+        method: 'POST',
+      });
+      return response.json();
+    },
+
+    // 导出数据为CSV
+    exportToCSV: async (): Promise<ApiResponse<{
+      filename: string;
+      totalSamples: number;
+      downloadUrl: string;
+    }>> => {
+      const response = await fetch(`${API_BASE_URL}/data-manager/export/csv`);
+      return response.json();
+    },
   },
 };

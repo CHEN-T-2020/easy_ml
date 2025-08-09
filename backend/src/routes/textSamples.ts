@@ -6,7 +6,7 @@ const router: Router = express.Router();
 interface TextSample {
   id: number;
   content: string;
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
   wordCount: number;
   qualityScore: number;
   createdAt: Date;
@@ -46,10 +46,10 @@ router.post('/', (req: Request, res: Response) => {
       });
     }
 
-    if (!['real', 'fake'].includes(label)) {
+    if (!['normal', 'clickbait'].includes(label)) {
       return res.status(400).json({
         success: false,
-        message: '标签必须是 "real" 或 "fake"'
+        message: '标签必须是 "normal" 或 "clickbait"'
       });
     }
 
@@ -119,10 +119,10 @@ router.post('/batch', (req: Request, res: Response) => {
       });
     }
 
-    if (!['real', 'fake'].includes(label)) {
+    if (!['normal', 'clickbait'].includes(label)) {
       return res.status(400).json({
         success: false,
-        message: '标签必须是 "real" 或 "fake"'
+        message: '标签必须是 "normal" 或 "clickbait"'
       });
     }
 
@@ -174,19 +174,19 @@ router.post('/batch', (req: Request, res: Response) => {
 
 // 获取统计信息
 router.get('/stats', (req: Request, res: Response) => {
-  const realSamples = samples.filter(s => s.label === 'real');
-  const fakeSamples = samples.filter(s => s.label === 'fake');
+  const normalSamples = samples.filter(s => s.label === 'normal');
+  const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
 
   res.json({
     success: true,
     data: {
       total: samples.length,
-      realCount: realSamples.length,
-      fakeCount: fakeSamples.length,
+      normalCount: normalSamples.length,
+      clickbaitCount: clickbaitSamples.length,
       averageQuality: samples.length > 0 
         ? samples.reduce((sum, s) => sum + s.qualityScore, 0) / samples.length 
         : 0,
-      canTrain: realSamples.length >= 3 && fakeSamples.length >= 3
+      canTrain: normalSamples.length >= 3 && clickbaitSamples.length >= 3
     }
   });
 });
@@ -207,7 +207,7 @@ function calculateQualityScore(content: string): number {
   const numberCount = (content.match(/\d+/g) || []).length;
   if (numberCount > 0) score += 0.1;
 
-  // 避免过度夸张词汇（针对假新闻）
+  // 避免过度夸张词汇（针对标题党）
   const exaggeratedWords = ['震惊', '重大发现', '不敢相信', '马上转发', '不转不是'];
   const hasExaggeration = exaggeratedWords.some(word => content.includes(word));
   if (hasExaggeration) score -= 0.3;

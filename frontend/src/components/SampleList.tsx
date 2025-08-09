@@ -5,20 +5,20 @@ import './styles.css';
 interface TextSample {
   id: number;
   content: string;
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
 }
 
 interface SampleListProps {
   samples: TextSample[];
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
   onDelete: (id: number) => void;
 }
 
 export const SampleList: React.FC<SampleListProps> = ({ samples, label, onDelete }) => {
   const [showAll, setShowAll] = useState(false);
   
-  const isReal = label === 'real';
-  const labelText = isReal ? '正常标题' : '标题党';
+  const isNormal = label === 'normal';
+  const labelText = isNormal ? '正常标题' : '标题党';
   
   // 按ID降序排列，显示最新添加的在前面
   const sortedSamples = [...samples].sort((a, b) => b.id - a.id);
@@ -36,7 +36,7 @@ export const SampleList: React.FC<SampleListProps> = ({ samples, label, onDelete
         {hiddenCount > 0 && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className={`toggle-button ${isReal ? 'real' : 'fake'}`}
+            className={`toggle-button ${isNormal ? 'normal' : 'clickbait'}`}
           >
             {showAll ? '收起' : `显示全部 (+${hiddenCount})`}
           </button>
@@ -66,7 +66,7 @@ export const SampleList: React.FC<SampleListProps> = ({ samples, label, onDelete
         <div className="sample-list-footer">
           <button
             onClick={() => setShowAll(false)}
-            className={`collapse-button ${isReal ? 'real' : 'fake'}`}
+            className={`collapse-button ${isNormal ? 'normal' : 'clickbait'}`}
           >
             收起列表
           </button>

@@ -2,11 +2,11 @@ import { TextFeatures } from './TextFeatureExtractor';
 
 export interface TrainingData {
   text: string;
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
 }
 
 export interface ClassificationResult {
-  prediction: 'real' | 'fake';
+  prediction: 'normal' | 'clickbait';
   confidence: number;
   features: TextFeatures;
   reasoning: string[];
@@ -109,11 +109,11 @@ export abstract class BaseClassifier {
         correct++;
       }
       
-      if (predicted === 'fake' && actual === 'fake') {
+      if (predicted === 'clickbait' && actual === 'clickbait') {
         truePositives++;
-      } else if (predicted === 'fake' && actual === 'real') {
+      } else if (predicted === 'clickbait' && actual === 'normal') {
         falsePositives++;
-      } else if (predicted === 'real' && actual === 'fake') {
+      } else if (predicted === 'normal' && actual === 'clickbait') {
         falseNegatives++;
       }
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './styles.css';
 
 interface PredictionResult {
@@ -23,10 +23,31 @@ interface TestingInterfaceProps {
 }
 
 export const TestingInterface: React.FC<TestingInterfaceProps> = ({ onBackToTraining, onGoToComparison }) => {
-  const [testText, setTestText] = useState('');
-  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [testText, setTestText] = useState(() => {
+    return localStorage.getItem('testing_testText') || '';
+  });
+  const [prediction, setPrediction] = useState<PredictionResult | null>(() => {
+    const saved = localStorage.getItem('testing_prediction');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [testHistory, setTestHistory] = useState<PredictionResult[]>([]);
+  const [testHistory, setTestHistory] = useState<PredictionResult[]>(() => {
+    const saved = localStorage.getItem('testing_history');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // 保存状态到localStorage
+  useEffect(() => {
+    localStorage.setItem('testing_testText', testText);
+  }, [testText]);
+
+  useEffect(() => {
+    localStorage.setItem('testing_prediction', JSON.stringify(prediction));
+  }, [prediction]);
+
+  useEffect(() => {
+    localStorage.setItem('testing_history', JSON.stringify(testHistory));
+  }, [testHistory]);
 
   const handlePredict = async () => {
     if (!testText.trim() || testText.length < 10) {

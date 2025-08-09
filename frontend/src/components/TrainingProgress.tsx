@@ -7,23 +7,23 @@ interface TrainingMetrics {
   recall: number;
   f1Score: number;
   trainingSamples: number;
-  realSamples: number;
-  fakeSamples: number;
+  normalSamples: number;
+  clickbaitSamples: number;
 }
 
 interface TrainingProgressProps {
   onTrainingComplete: (metrics: TrainingMetrics) => void;
   onStartTesting: () => void;
-  realSamplesCount: number;
-  fakeSamplesCount: number;
+  normalSamplesCount: number;
+  clickbaitSamplesCount: number;
   onGoToDataCollection: () => void;
 }
 
 export const TrainingProgress: React.FC<TrainingProgressProps> = ({ 
   onTrainingComplete, 
   onStartTesting,
-  realSamplesCount,
-  fakeSamplesCount,
+  normalSamplesCount,
+  clickbaitSamplesCount,
   onGoToDataCollection
 }) => {
   const [trainingStatus, setTrainingStatus] = useState<{
@@ -32,19 +32,43 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
     message: string;
     metrics: TrainingMetrics | null;
     isModelTrained: boolean;
-  }>({
-    status: 'idle',
-    progress: 0,
-    message: '',
-    metrics: null,
-    isModelTrained: false
+  }>(() => {
+    // 从localStorage恢复训练状态
+    const saved = localStorage.getItem('training_status');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        console.error('恢复训练状态失败:', error);
+      }
+    }
+    return {
+      status: 'idle',
+      progress: 0,
+      message: '',
+      metrics: null,
+      isModelTrained: false
+    };
   });
 
-  const [isPolling, setIsPolling] = useState(false);
+  const [isPolling, setIsPolling] = useState(() => {
+    const saved = localStorage.getItem('training_isPolling');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // 保存训练状态到localStorage
+  useEffect(() => {
+    localStorage.setItem('training_status', JSON.stringify(trainingStatus));
+  }, [trainingStatus]);
+
+  // 保存轮询状态到localStorage
+  useEffect(() => {
+    localStorage.setItem('training_isPolling', JSON.stringify(isPolling));
+  }, [isPolling]);
 
   // 检查是否有足够的数据进行训练
-  const canTrain = realSamplesCount >= 3 && fakeSamplesCount >= 3;
-  const totalSamples = realSamplesCount + fakeSamplesCount;
+  const canTrain = normalSamplesCount >= 3 && clickbaitSamplesCount >= 3;
+  const totalSamples = normalSamplesCount + clickbaitSamplesCount;
 
   // 检查训练状态
   const checkTrainingStatus = async () => {
@@ -167,7 +191,7 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
           <div className="status-text">
             <h3 className="status-title text-gray-800">训练数据状态</h3>
             <p className="status-message">
-              当前样本: {realSamplesCount} 条正常标题, {fakeSamplesCount} 条标题党 (共 {totalSamples} 条)
+              当前样本: {normalSamplesCount} 条正常标题, {clickbaitSamplesCount} 条标题党 (共 {totalSamples} 条)
             </p>
           </div>
         </div>
@@ -179,7 +203,7 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
               <div className="warning-text">
                 <h4 className="warning-title">数据不足，无法开始训练</h4>
                 <p className="warning-message">
-                  至少需要 {Math.max(0, 3 - realSamplesCount)} 条正常标题和 {Math.max(0, 3 - fakeSamplesCount)} 条标题党样本
+                  至少需要 {Math.max(0, 3 - normalSamplesCount)} 条正常标题和 {Math.max(0, 3 - clickbaitSamplesCount)} 条标题党样本
                 </p>
               </div>
             </div>
@@ -247,7 +271,7 @@ export const TrainingProgress: React.FC<TrainingProgressProps> = ({
             </div>
             <div className="training-info">
               <p>训练样本: {trainingStatus.metrics.trainingSamples} 条</p>
-              <p>正常标题: {trainingStatus.metrics.realSamples} 条 | 标题党: {trainingStatus.metrics.fakeSamples} 条</p>
+              <p>正常标题: {trainingStatus.metrics.normalSamples} 条 | 标题党: {trainingStatus.metrics.clickbaitSamples} 条</p>
             </div>
           </div>
         )}

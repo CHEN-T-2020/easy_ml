@@ -1,0 +1,1611 @@
+{
+  "name": "标题党识别训练数据集",
+  "description": "包含50条正常标题和50条标题党的训练数据集",
+  "version": "1.0.0",
+  "createdAt": "2025-08-04T00:00:00.000Z",
+  "totalSamples": 100,
+  "normalCount": 50,
+  "clickbaitCount": 50,
+  "samples": [
+    {
+      "id": 1001,
+      "content": "国家发改委发布新一轮基础设施投资计划",
+      "label": "normal",
+      "category": "政务",
+      "source": "官方新闻",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1002,
+      "content": "教育部公布2024年全国高校毕业生就业数据统计",
+      "label": "normal",
+      "category": "政务",
+      "source": "官方发布",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1003,
+      "content": "央行宣布维持基准利率不变，继续实施稳健货币政策",
+      "label": "normal",
+      "category": "财经",
+      "source": "央行公告",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.95
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1004,
+      "content": "北京市启动新一轮老旧小区改造工程，涉及500个社区",
+      "label": "normal",
+      "category": "民生",
+      "source": "市政府",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1005,
+      "content": "交通运输部发布春运期间全国客流量预测报告",
+      "label": "normal",
+      "category": "民生",
+      "source": "交通部",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1006,
+      "content": "国家统计局：前11个月全国规模以上工业增加值同比增长4.3%",
+      "label": "normal",
+      "category": "财经",
+      "source": "统计局",
+      "qualityMetrics": {
+        "wordCount": 29,
+        "complexityScore": 0.8,
+        "reliabilityScore": 0.95
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1007,
+      "content": "生态环境部通报11月全国空气质量状况，优良天数比例为85.7%",
+      "label": "normal",
+      "category": "环保",
+      "source": "环境部",
+      "qualityMetrics": {
+        "wordCount": 30,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1008,
+      "content": "工信部：5G基站总数已超过320万个，覆盖全国所有地级市",
+      "label": "normal",
+      "category": "科技",
+      "source": "工信部",
+      "qualityMetrics": {
+        "wordCount": 27,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1009,
+      "content": "农业农村部：全国粮食产量连续9年稳定在1.3万亿斤以上",
+      "label": "normal",
+      "category": "农业",
+      "source": "农业部",
+      "qualityMetrics": {
+        "wordCount": 26,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.95
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1010,
+      "content": "卫健委发布流感疫苗接种建议，重点人群应优先接种",
+      "label": "normal",
+      "category": "医疗",
+      "source": "卫健委",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1011,
+      "content": "商务部：前三季度我国实际使用外资金额同比增长6.2%",
+      "label": "normal",
+      "category": "财经",
+      "source": "商务部",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.8,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1012,
+      "content": "住建部：全国保障性租赁住房开工建设超过200万套",
+      "label": "normal",
+      "category": "民生",
+      "source": "住建部",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1013,
+      "content": "中科院发布人工智能技术在气候预测领域的最新研究成果",
+      "label": "normal",
+      "category": "科技",
+      "source": "中科院",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.8,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1014,
+      "content": "海关总署：11月份我国进出口总值同比增长1.2%",
+      "label": "normal",
+      "category": "财经",
+      "source": "海关总署",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.95
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1015,
+      "content": "国家邮政局：11月快递业务量达到121.7亿件",
+      "label": "normal",
+      "category": "民生",
+      "source": "邮政局",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1016,
+      "content": "文旅部：全国A级旅游景区总数已达15000余家",
+      "label": "normal",
+      "category": "文旅",
+      "source": "文旅部",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1017,
+      "content": "应急管理部发布冬季安全生产和火灾防控工作通知",
+      "label": "normal",
+      "category": "安全",
+      "source": "应急部",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1018,
+      "content": "市场监管总局开展网络直播电商专项整治行动",
+      "label": "normal",
+      "category": "监管",
+      "source": "市监局",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1019,
+      "content": "人社部：全国基本养老保险参保人数超过10.7亿人",
+      "label": "normal",
+      "category": "民生",
+      "source": "人社部",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.95
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1020,
+      "content": "司法部推进公共法律服务体系建设，便民服务再升级",
+      "label": "normal",
+      "category": "司法",
+      "source": "司法部",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1021,
+      "content": "本市今日最高气温达到8℃，明日将有小雨天气",
+      "label": "normal",
+      "category": "天气",
+      "source": "气象台",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.5,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1022,
+      "content": "地铁3号线因设备检修，部分区段运行间隔延长至10分钟",
+      "label": "normal",
+      "category": "交通",
+      "source": "地铁公司",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1023,
+      "content": "社区卫生服务中心开展儿童免费体检活动",
+      "label": "normal",
+      "category": "医疗",
+      "source": "社区医院",
+      "qualityMetrics": {
+        "wordCount": 17,
+        "complexityScore": 0.5,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1024,
+      "content": "市图书馆新增数字阅读设备，提供24小时自助服务",
+      "label": "normal",
+      "category": "文化",
+      "source": "图书馆",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1025,
+      "content": "本周末多条公交线路因道路施工临时调整运行路线",
+      "label": "normal",
+      "category": "交通",
+      "source": "公交公司",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1026,
+      "content": "某新能源汽车公司第三季度销量同比增长45%",
+      "label": "normal",
+      "category": "财经",
+      "source": "财经媒体",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1027,
+      "content": "研究显示，规律运动可降低心血管疾病风险达30%",
+      "label": "normal",
+      "category": "医疗",
+      "source": "医学期刊",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1028,
+      "content": "国产大飞机C919完成首次商业飞行，标志重要里程碑",
+      "label": "normal",
+      "category": "科技",
+      "source": "航空新闻",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.9
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1029,
+      "content": "本市新增3处公园绿地，总面积约200公顷",
+      "label": "normal",
+      "category": "环保",
+      "source": "园林局",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1030,
+      "content": "学校食堂推出营养配餐服务，确保学生饮食健康",
+      "label": "normal",
+      "category": "教育",
+      "source": "学校通知",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1031,
+      "content": "电信运营商宣布降低国际漫游费用，惠及出境用户",
+      "label": "normal",
+      "category": "科技",
+      "source": "运营商",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1032,
+      "content": "环保部门加强冬季大气污染防治，实施精准管控",
+      "label": "normal",
+      "category": "环保",
+      "source": "环保局",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1033,
+      "content": "银行推出小微企业专项贷款产品，支持实体经济发展",
+      "label": "normal",
+      "category": "财经",
+      "source": "银行公告",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1034,
+      "content": "科研团队在量子计算领域取得重要技术突破",
+      "label": "normal",
+      "category": "科技",
+      "source": "科研院所",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.8,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1035,
+      "content": "医院开通线上预约挂号服务，方便患者就医",
+      "label": "normal",
+      "category": "医疗",
+      "source": "医院公告",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1036,
+      "content": "农业专家指导农民采用新技术，提高作物产量",
+      "label": "normal",
+      "category": "农业",
+      "source": "农技站",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1037,
+      "content": "博物馆举办传统文化展览，弘扬民族文化精神",
+      "label": "normal",
+      "category": "文化",
+      "source": "博物馆",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1038,
+      "content": "消防部门开展安全检查，消除各类火灾隐患",
+      "label": "normal",
+      "category": "安全",
+      "source": "消防局",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1039,
+      "content": "体育场馆向市民免费开放，促进全民健身运动",
+      "label": "normal",
+      "category": "体育",
+      "source": "体育局",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1040,
+      "content": "供水公司完成老旧管网改造，提升供水质量",
+      "label": "normal",
+      "category": "民生",
+      "source": "水务公司",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1041,
+      "content": "气象台发布寒潮预警，提醒市民注意防寒保暖",
+      "label": "normal",
+      "category": "天气",
+      "source": "气象台",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1042,
+      "content": "邮政部门推出便民服务措施，提高邮递效率",
+      "label": "normal",
+      "category": "民生",
+      "source": "邮政局",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1043,
+      "content": "大学发布毕业生就业质量报告，就业率稳中有升",
+      "label": "normal",
+      "category": "教育",
+      "source": "大学",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1044,
+      "content": "食品监管部门开展专项检查，确保食品安全",
+      "label": "normal",
+      "category": "安全",
+      "source": "食药监局",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.85
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1045,
+      "content": "社会保险经办机构优化服务流程，提升办事效率",
+      "label": "normal",
+      "category": "民生",
+      "source": "社保局",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1046,
+      "content": "电力公司完成电网升级改造，保障可靠供电",
+      "label": "normal",
+      "category": "民生",
+      "source": "电力公司",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1047,
+      "content": "法院推行智慧审判系统，提高司法办案效率",
+      "label": "normal",
+      "category": "司法",
+      "source": "法院",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.7,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1048,
+      "content": "物价部门监测市场价格变化，维护市场秩序",
+      "label": "normal",
+      "category": "监管",
+      "source": "物价局",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1049,
+      "content": "城管部门加强市容环境整治，美化城市面貌",
+      "label": "normal",
+      "category": "民生",
+      "source": "城管局",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 1050,
+      "content": "税务部门推出便民办税措施，简化办税程序",
+      "label": "normal",
+      "category": "民生",
+      "source": "税务局",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.6,
+        "reliabilityScore": 0.8
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2001,
+      "content": "震惊！这种食物竟然比毒药还可怕，99%的人都在吃！",
+      "label": "clickbait",
+      "category": "健康谣言",
+      "source": "自媒体",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2002,
+      "content": "不敢相信！这个秘方让我30天瘦了50斤，医生都惊呆了！",
+      "label": "clickbait",
+      "category": "减肥骗局",
+      "source": "广告",
+      "qualityMetrics": {
+        "wordCount": 26,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2003,
+      "content": "速看！银行内部人员透露，这样存钱一年多赚20万！",
+      "label": "clickbait",
+      "category": "理财骗局",
+      "source": "虚假广告",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2004,
+      "content": "太恐怖了！手机这样充电竟会爆炸，已有人死亡！",
+      "label": "clickbait",
+      "category": "恐慌传播",
+      "source": "谣言",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2005,
+      "content": "重磅消息！某明星私生活曝光，网友看后都炸锅了！",
+      "label": "clickbait",
+      "category": "娱乐八卦",
+      "source": "八卦媒体",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2006,
+      "content": "神奇！这个老中医的偏方，让癌症患者起死回生！",
+      "label": "clickbait",
+      "category": "医疗骗局",
+      "source": "虚假宣传",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2007,
+      "content": "惊人内幕！这些大品牌竟然都是假货，赶紧检查！",
+      "label": "clickbait",
+      "category": "消费恐慌",
+      "source": "造谣",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2008,
+      "content": "绝密！马云都在用的赚钱方法，普通人也能月入十万！",
+      "label": "clickbait",
+      "category": "财富诱惑",
+      "source": "诈骗广告",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2009,
+      "content": "必须转发！这种洗发水有毒，用了会致癌脱发！",
+      "label": "clickbait",
+      "category": "产品恐慌",
+      "source": "谣言传播",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2010,
+      "content": "炸了！这位女星整容前后差距太大，完全是两个人！",
+      "label": "clickbait",
+      "category": "娱乐炒作",
+      "source": "娱乐媒体",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2011,
+      "content": "警告！这些症状出现说明你要发大财了，准确率100%！",
+      "label": "clickbait",
+      "category": "迷信传播",
+      "source": "封建迷信",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2012,
+      "content": "不看后悔！这个副业让我辞掉工作，月入过万在家躺赚！",
+      "label": "clickbait",
+      "category": "兼职骗局",
+      "source": "网络诈骗",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2013,
+      "content": "爆料！某导演潜规则女演员内幕，整个圈子都震惊了！",
+      "label": "clickbait",
+      "category": "娱乐谣言",
+      "source": "造谣媒体",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2014,
+      "content": "千万别买！这些牌子的奶粉全是毒奶粉，害惨孩子！",
+      "label": "clickbait",
+      "category": "食品恐慌",
+      "source": "恶意造谣",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2015,
+      "content": "奇迹！这个农民发明的东西，让全世界都疯狂了！",
+      "label": "clickbait",
+      "category": "夸大宣传",
+      "source": "炒作",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2016,
+      "content": "揭秘！这个保健品的惊人效果，医生都不敢说！",
+      "label": "clickbait",
+      "category": "保健品骗局",
+      "source": "虚假宣传",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2017,
+      "content": "紧急通知！这种水果有毒，吃一口等于吃毒药！",
+      "label": "clickbait",
+      "category": "食品谣言",
+      "source": "谣言制造",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2018,
+      "content": "火爆全网！这个网红的真实身份曝光，太惊人了！",
+      "label": "clickbait",
+      "category": "网络炒作",
+      "source": "炒作账号",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2019,
+      "content": "独家爆料！这个行业内幕太黑暗，从业者都不敢说！",
+      "label": "clickbait",
+      "category": "行业黑幕",
+      "source": "恶意传播",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2020,
+      "content": "惊呆了！原来感冒不用吃药，用这个方法三天就好！",
+      "label": "clickbait",
+      "category": "医疗误导",
+      "source": "伪科学",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2021,
+      "content": "震撼！这个小学生的发明震惊全球，连科学家都佩服！",
+      "label": "clickbait",
+      "category": "夸大炒作",
+      "source": "虚假新闻",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2022,
+      "content": "重大发现！科学家证实这个食物能治百病，太神奇了！",
+      "label": "clickbait",
+      "category": "伪科学",
+      "source": "造谣",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2023,
+      "content": "太可怕了！这个生活习惯让你短命10年，快改掉！",
+      "label": "clickbait",
+      "category": "健康恐慌",
+      "source": "健康谣言",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2024,
+      "content": "绝密消息！国家要发钱了，每人可领2万元，速度申请！",
+      "label": "clickbait",
+      "category": "诈骗信息",
+      "source": "诈骗分子",
+      "qualityMetrics": {
+        "wordCount": 25,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2025,
+      "content": "疯传！这个视频看完的人都疯了，胆小勿点！",
+      "label": "clickbait",
+      "category": "恐慌营销",
+      "source": "标题党",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2026,
+      "content": "内幕曝光！这些知名企业背后的黑暗秘密，让人愤怒！",
+      "label": "clickbait",
+      "category": "企业黑幕",
+      "source": "恶意造谣",
+      "qualityMetrics": {
+        "wordCount": 24,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2027,
+      "content": "天啊！这个东西家家都有，竟然致癌率高达90%！",
+      "label": "clickbait",
+      "category": "致癌谣言",
+      "source": "健康谣言",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2028,
+      "content": "不转不是中国人！这个真相每个人都应该知道！",
+      "label": "clickbait",
+      "category": "道德绑架",
+      "source": "恶意传播",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2029,
+      "content": "史上最强！这个学习方法让孩子成绩飞速提升！",
+      "label": "clickbait",
+      "category": "教育炒作",
+      "source": "教育广告",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2030,
+      "content": "惊人真相！这个明星的死因终于曝光了，太震撼！",
+      "label": "clickbait",
+      "category": "死亡炒作",
+      "source": "娱乐造谣",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2031,
+      "content": "看哭了！这个老人的故事让全国人民都感动流泪！",
+      "label": "clickbait",
+      "category": "情感炒作",
+      "source": "情感营销",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2032,
+      "content": "激怒！这个外国人在中国做的事，让人无法容忍！",
+      "label": "clickbait",
+      "category": "民族情绪",
+      "source": "煽动账号",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2033,
+      "content": "神秘！这个预言竟然全部应验了，预测下一年大事！",
+      "label": "clickbait",
+      "category": "迷信预测",
+      "source": "封建迷信",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2034,
+      "content": "恐怖！这个地方发生的事情，让专家都无法解释！",
+      "label": "clickbait",
+      "category": "神秘事件",
+      "source": "猎奇媒体",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2035,
+      "content": "巨大阴谋！这个行业的黑幕终于被揭露，太可怕了！",
+      "label": "clickbait",
+      "category": "阴谋论",
+      "source": "阴谋媒体",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2036,
+      "content": "免费送！这个价值千元的东西，现在不要钱！",
+      "label": "clickbait",
+      "category": "免费诱饵",
+      "source": "营销骗局",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2037,
+      "content": "权威发布！这个消息关系到每个人的钱包，必看！",
+      "label": "clickbait",
+      "category": "假权威",
+      "source": "虚假权威",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2038,
+      "content": "限时！今天不看明天就没了，错过后悔一辈子！",
+      "label": "clickbait",
+      "category": "紧迫性营销",
+      "source": "营销号",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2039,
+      "content": "逆天了！这个技术让人类寿命延长到200岁！",
+      "label": "clickbait",
+      "category": "科技谣言",
+      "source": "伪科学",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2040,
+      "content": "暴富秘籍！这个方法让你一夜之间成为千万富翁！",
+      "label": "clickbait",
+      "category": "暴富幻想",
+      "source": "投资骗局",
+      "qualityMetrics": {
+        "wordCount": 22,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2041,
+      "content": "末日警告！这个灾难即将降临，人类要完蛋了！",
+      "label": "clickbait",
+      "category": "末日恐慌",
+      "source": "恐慌制造",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2042,
+      "content": "举报！这些官员贪污的数额让人震惊，太黑暗了！",
+      "label": "clickbait",
+      "category": "政治谣言",
+      "source": "造谣账号",
+      "qualityMetrics": {
+        "wordCount": 23,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2043,
+      "content": "破产了！这些大企业即将倒闭，员工全部失业！",
+      "label": "clickbait",
+      "category": "经济恐慌",
+      "source": "恶意造谣",
+      "qualityMetrics": {
+        "wordCount": 21,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2044,
+      "content": "危险！这些常用药物竟然有毒，赶紧扔掉！",
+      "label": "clickbait",
+      "category": "医药恐慌",
+      "source": "医疗谣言",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.05
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2045,
+      "content": "天价医疗费！这个病人的账单吓坏了所有人！",
+      "label": "clickbait",
+      "category": "医疗恐慌",
+      "source": "夸大报道",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.2
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2046,
+      "content": "血腥真相！这个工厂的内幕让人不敢相信！",
+      "label": "clickbait",
+      "category": "工厂黑幕",
+      "source": "恶意传播",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2047,
+      "content": "全民疯抢！这个东西免费领取，手慢无！",
+      "label": "clickbait",
+      "category": "免费骗局",
+      "source": "营销诈骗",
+      "qualityMetrics": {
+        "wordCount": 18,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2048,
+      "content": "毁童年！这些动画片竟然隐藏着恐怖秘密！",
+      "label": "clickbait",
+      "category": "童年阴影",
+      "source": "猎奇账号",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2049,
+      "content": "惊天骗局！这个投资项目让无数人倾家荡产！",
+      "label": "clickbait",
+      "category": "投资警告",
+      "source": "财经谣言",
+      "qualityMetrics": {
+        "wordCount": 20,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.3
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    },
+    {
+      "id": 2050,
+      "content": "史无前例！这个发现将改变人类历史进程！",
+      "label": "clickbait",
+      "category": "夸大发现",
+      "source": "科技炒作",
+      "qualityMetrics": {
+        "wordCount": 19,
+        "complexityScore": 0.3,
+        "reliabilityScore": 0.1
+      },
+      "metadata": {
+        "datasetType": "training",
+        "version": 1
+      }
+    }
+  ]
+}

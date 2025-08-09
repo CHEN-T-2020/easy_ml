@@ -52,13 +52,13 @@ router.post('/training/start', async (req: Request, res: Response) => {
       });
     }
 
-    const realSamples = samples.filter(s => s.label === 'real');
-    const fakeSamples = samples.filter(s => s.label === 'fake');
+    const normalSamples = samples.filter(s => s.label === 'normal');
+    const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
 
-    console.log('正常标题样本:', realSamples.length);
-    console.log('标题党样本:', fakeSamples.length);
+    console.log('正常标题样本:', normalSamples.length);
+    console.log('标题党样本:', clickbaitSamples.length);
 
-    if (realSamples.length === 0 || fakeSamples.length === 0) {
+    if (normalSamples.length === 0 || clickbaitSamples.length === 0) {
       return res.status(400).json({
         success: false,
         message: '需要同时包含正常标题和标题党样本'
@@ -110,8 +110,8 @@ router.post('/training/start', async (req: Request, res: Response) => {
             recall: 83,
             f1Score: 85,
             trainingSamples: samples.length,
-            realSamples: realSamples.length,
-            fakeSamples: fakeSamples.length
+            normalSamples: normalSamples.length,
+            clickbaitSamples: clickbaitSamples.length
           }
         };
 
@@ -193,7 +193,7 @@ router.post('/predict', (req: Request, res: Response) => {
       success: true,
       data: {
         text: cleanText,
-        prediction: isClickbait ? 'fake' : 'real',
+        prediction: isClickbait ? 'clickbait' : 'normal',
         confidence: Math.round(confidence),
         reasoning: reasoning,
         features: {
@@ -248,7 +248,7 @@ router.post('/predict/batch', (req: Request, res: Response) => {
       
       return {
         text: cleanText,
-        prediction: isClickbait ? 'fake' : 'real',
+        prediction: isClickbait ? 'clickbait' : 'normal',
         confidence: Math.round(Math.random() * 30 + 70), // 70-100的置信度
         reasoning: hasClickbaitWords ? ['包含标题党关键词'] : ['用词相对客观']
       };
@@ -259,8 +259,8 @@ router.post('/predict/batch', (req: Request, res: Response) => {
       data: {
         results,
         total: results.length,
-        clickbaitCount: results.filter(r => r.prediction === 'fake').length,
-        normalCount: results.filter(r => r.prediction === 'real').length
+        clickbaitCount: results.filter(r => r.prediction === 'clickbait').length,
+        normalCount: results.filter(r => r.prediction === 'normal').length
       }
     });
 

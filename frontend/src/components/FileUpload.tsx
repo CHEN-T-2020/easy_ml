@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import './styles.css';
 
 interface FileUploadProps {
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
   onFilesUploaded: (texts: string[]) => void;
 }
 
@@ -12,8 +12,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, onFilesUploaded }
   const [uploadMessage, setUploadMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isReal = label === 'real';
-  const labelText = isReal ? '正常标题' : '标题党';
+  const isNormal = label === 'normal';
+  const labelText = isNormal ? '正常标题' : '标题党';
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith('.txt')) {
@@ -96,7 +96,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, onFilesUploaded }
   };
 
   return (
-    <div className={`file-upload-container ${isReal ? 'real' : 'fake'}`}>
+    <div className={`file-upload-container ${isNormal ? 'normal' : 'clickbait'}`}>
       <div
         className={`file-upload-area ${isDragOver ? 'drag-over' : ''} ${uploadStatus}`}
         onDragOver={handleDragOver}

@@ -114,7 +114,7 @@ curl -X POST http://localhost:3001/api/text-samples/batch \
   -H "Content-Type: application/json" \
   -d '{
     "texts": ["正常标题内容1", "正常标题内容2"],
-    "label": "real"
+    "label": "normal"
   }'
 ```
 

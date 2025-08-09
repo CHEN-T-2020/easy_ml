@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProgressBar } from './components/ProgressBar';
 import { TextInput } from './components/TextInput';
 import { SampleList } from './components/SampleList';
@@ -11,12 +11,12 @@ import { api } from './utils/api';
 interface TextSample {
   id: number;
   content: string;
-  label: 'real' | 'fake';
+  label: 'normal' | 'clickbait';
 }
 
 // 示例数据用于快速试用
 const SAMPLE_DATA = {
-  real: [
+  normal: [
     // 政务新闻
     "教育部发布2024年高校招生政策调整通知",
     "国家统计局：前三季度GDP同比增长5.2%",
@@ -41,7 +41,7 @@ const SAMPLE_DATA = {
     "图书馆将于下月推出24小时自助借阅服务",
     "学校食堂实施营养餐计划，改善学生饮食质量"
   ],
-  fake: [
+  clickbait: [
     // 健康谣言类
     "震惊！这个方法让你30天暴瘦20斤，不看后悔一辈子！",
     "太可怕了！这种食物吃一口等于吃10根香烟，赶紧告诉家人",
@@ -69,31 +69,80 @@ const SAMPLE_DATA = {
 };
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [realNewsText, setRealNewsText] = useState('');
-  const [fakeNewsText, setFakeNewsText] = useState('');
+  // 从localStorage恢复状态
+  const [currentStep, setCurrentStep] = useState(() => {
+    const saved = localStorage.getItem('app_currentStep');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [normalNewsText, setNormalNewsText] = useState(() => {
+    return localStorage.getItem('app_normalNewsText') || '';
+  });
+  const [clickbaitNewsText, setClickbaitNewsText] = useState(() => {
+    return localStorage.getItem('app_clickbaitNewsText') || '';
+  });
   const [samples, setSamples] = useState<TextSample[]>([]);
 
   const steps = ['收集数据', '训练模型', '测试识别', '模型对比'];
 
-  const addSample = async (content: string, label: 'real' | 'fake') => {
+  // 保存状态到localStorage
+  const saveStateToStorage = () => {
+    localStorage.setItem('app_currentStep', currentStep.toString());
+    localStorage.setItem('app_normalNewsText', normalNewsText);
+    localStorage.setItem('app_clickbaitNewsText', clickbaitNewsText);
+  };
+
+  // 监听状态变化并保存
+  useEffect(() => {
+    saveStateToStorage();
+  }, [currentStep, normalNewsText, clickbaitNewsText]);
+
+  // 清除所有保存的状态（重置功能）
+  const clearAllSavedState = () => {
+    const keys = [
+      'app_currentStep', 'app_normalNewsText', 'app_clickbaitNewsText',
+      'training_status', 'training_isPolling',
+      'testing_testText', 'testing_prediction', 'testing_history',
+      'comparison_models', 'comparison_results', 'comparison_summary', 
+      'comparison_testText', 'comparison_trainingStatus'
+    ];
+    keys.forEach(key => localStorage.removeItem(key));
+  };
+
+  // 获取当前样本数据
+  const fetchSamples = async () => {
+    try {
+      const response = await api.getSamples();
+      if (response.success && response.data) {
+        const fetchedSamples: TextSample[] = response.data.map(sample => ({
+          id: sample.id,
+          content: sample.content,
+          label: sample.label
+        }));
+        setSamples(fetchedSamples);
+      }
+    } catch (error) {
+      console.error('获取样本失败:', error);
+    }
+  };
+
+  // 在组件挂载和步骤切换时获取样本数据
+  useEffect(() => {
+    fetchSamples();
+  }, [currentStep]);
+
+  const addSample = async (content: string, label: 'normal' | 'clickbait') => {
     if (content.length < 10) return;
     
     try {
       const response = await api.addSample(content, label);
       if (response.success && response.data) {
-        const newSample: TextSample = {
-          id: response.data.id,
-          content: response.data.content,
-          label: response.data.label
-        };
+        // 重新获取最新的样本数据
+        await fetchSamples();
         
-        setSamples([...samples, newSample]);
-        
-        if (label === 'real') {
-          setRealNewsText('');
+        if (label === 'normal') {
+          setNormalNewsText('');
         } else {
-          setFakeNewsText('');
+          setClickbaitNewsText('');
         }
       }
     } catch (error) {
@@ -101,17 +150,12 @@ function App() {
     }
   };
 
-  const handleBatchUpload = async (texts: string[], label: 'real' | 'fake') => {
+  const handleBatchUpload = async (texts: string[], label: 'normal' | 'clickbait') => {
     try {
       const response = await api.batchUpload(texts, label);
       if (response.success && response.data) {
-        const newSamples: TextSample[] = response.data.samples.map(sample => ({
-          id: sample.id,
-          content: sample.content,
-          label: sample.label
-        }));
-        
-        setSamples(prevSamples => [...prevSamples, ...newSamples]);
+        // 重新获取最新的样本数据
+        await fetchSamples();
       }
     } catch (error) {
       console.error('批量上传失败:', error);
@@ -122,58 +166,67 @@ function App() {
     try {
       const response = await api.deleteSample(id);
       if (response.success) {
-        setSamples(samples.filter(sample => sample.id !== id));
+        // 重新获取最新的样本数据
+        await fetchSamples();
       }
     } catch (error) {
       console.error('删除样本失败:', error);
     }
   };
 
-  // 快速试用功能：加载示例数据
+  // 快速试用功能：加载100条训练数据
   const loadSampleData = async () => {
     try {
-      // 加载正常标题
-      const realResponse = await api.batchUpload(SAMPLE_DATA.real, 'real');
-      if (realResponse.success && realResponse.data) {
-        const realSamples: TextSample[] = realResponse.data.samples.map(sample => ({
-          id: sample.id,
-          content: sample.content,
-          label: sample.label
-        }));
+      // 首先获取训练数据集信息
+      const datasetInfo = await api.dataManager.getTrainingDataset();
+      if (!datasetInfo.success || !datasetInfo.data) {
+        alert('训练数据集不存在，请检查系统配置');
+        return;
+      }
+
+      // 导入训练数据集到系统
+      const importResponse = await api.dataManager.importTrainingDataset();
+      if (importResponse.success && importResponse.data) {
+        // 重新获取最新的样本数据
+        await fetchSamples();
         
-        // 加载标题党
-        const fakeResponse = await api.batchUpload(SAMPLE_DATA.fake, 'fake');
-        if (fakeResponse.success && fakeResponse.data) {
-          const fakeSamples: TextSample[] = fakeResponse.data.samples.map(sample => ({
-            id: sample.id,
-            content: sample.content,
-            label: sample.label
-          }));
-          
-          // 更新状态
-          setSamples(prevSamples => [...prevSamples, ...realSamples, ...fakeSamples]);
-          
-          // 显示成功提示
-          alert(`成功加载示例数据：${realSamples.length} 条正常标题，${fakeSamples.length} 条标题党`);
-        }
+        // 显示成功提示
+        alert(`成功加载训练数据集：${importResponse.data.normalCount} 条正常标题，${importResponse.data.clickbaitCount} 条标题党 (共${importResponse.data.importedCount}条)`);
       }
     } catch (error) {
-      console.error('加载示例数据失败:', error);
-      alert('加载示例数据失败，请稍后重试');
+      console.error('加载训练数据失败:', error);
+      alert('加载训练数据失败，请稍后重试');
     }
   };
 
-  const realSamples = samples.filter(s => s.label === 'real');
-  const fakeSamples = samples.filter(s => s.label === 'fake');
+  const normalSamples = samples.filter(s => s.label === 'normal');
+  const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
 
-  const canProceed = realSamples.length >= 3 && fakeSamples.length >= 3;
+  const canProceed = normalSamples.length >= 3 && clickbaitSamples.length >= 3;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">标题党识别训练平台</h1>
-          <p className="text-gray-600">学习识别诱导性标题，培养媒体素养</p>
+          <div className="flex justify-between items-start mb-4">
+            <div></div>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">标题党识别训练平台</h1>
+              <p className="text-gray-600">学习识别诱导性标题，培养媒体素养</p>
+            </div>
+            <button
+              onClick={() => {
+                if (window.confirm('确定要重置所有数据和进度吗？这将清除所有训练结果和测试历史。')) {
+                  clearAllSavedState();
+                  window.location.reload();
+                }
+              }}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+              title="重置所有状态"
+            >
+              重置
+            </button>
+          </div>
         </header>
 
         <ProgressBar 
@@ -191,14 +244,14 @@ function App() {
             </div>
 
             {/* 快速试用功能 */}
-            {samples.length === 0 && (
+            {samples.length < 50 && (
               <div className="quick-demo-card">
                 <div className="demo-header">
                   <div className="demo-icon">🚀</div>
                   <div className="demo-content">
                     <h3 className="demo-title">快速试用</h3>
                     <p className="demo-description">
-                      不想手动输入数据？点击下方按钮加载示例数据，立即体验完整功能
+                      不想手动输入数据？点击下方按钮加载100条专业训练数据集，立即体验完整功能
                     </p>
                   </div>
                 </div>
@@ -207,7 +260,7 @@ function App() {
                   className="demo-button"
                 >
                   <span className="button-icon">⚡</span>
-                  加载示例数据 (16条正常标题 + 16条标题党)
+                  加载训练数据集 (50条正常标题 + 50条标题党)
                 </button>
               </div>
             )}
@@ -217,20 +270,20 @@ function App() {
                 <TextInput
                   label="正常标题"
                   placeholder="请输入正常、客观的标题内容..."
-                  value={realNewsText}
-                  onChange={setRealNewsText}
-                  onAdd={() => addSample(realNewsText, 'real')}
+                  value={normalNewsText}
+                  onChange={setNormalNewsText}
+                  onAdd={() => addSample(normalNewsText, 'normal')}
                   labelColor="green"
                 />
                 
                 <FileUpload
-                  label="real"
-                  onFilesUploaded={(texts) => handleBatchUpload(texts, 'real')}
+                  label="normal"
+                  onFilesUploaded={(texts) => handleBatchUpload(texts, 'normal')}
                 />
                 
                 <SampleList
-                  samples={realSamples}
-                  label="real"
+                  samples={normalSamples}
+                  label="normal"
                   onDelete={deleteSample}
                 />
               </div>
@@ -239,20 +292,20 @@ function App() {
                 <TextInput
                   label="标题党"
                   placeholder="请输入夸张、诱导性的标题内容..."
-                  value={fakeNewsText}
-                  onChange={setFakeNewsText}
-                  onAdd={() => addSample(fakeNewsText, 'fake')}
+                  value={clickbaitNewsText}
+                  onChange={setClickbaitNewsText}
+                  onAdd={() => addSample(clickbaitNewsText, 'clickbait')}
                   labelColor="red"
                 />
                 
                 <FileUpload
-                  label="fake"
-                  onFilesUploaded={(texts) => handleBatchUpload(texts, 'fake')}
+                  label="clickbait"
+                  onFilesUploaded={(texts) => handleBatchUpload(texts, 'clickbait')}
                 />
                 
                 <SampleList
-                  samples={fakeSamples}
-                  label="fake"
+                  samples={clickbaitSamples}
+                  label="clickbait"
                   onDelete={deleteSample}
                 />
               </div>
@@ -270,11 +323,11 @@ function App() {
             <div className="text-center">
               <div className="mb-4">
                 <p className="text-sm text-gray-600 mb-2">
-                  当前样本: {realSamples.length} 条正常标题, {fakeSamples.length} 条标题党
+                  当前样本: {normalSamples.length} 条正常标题, {clickbaitSamples.length} 条标题党
                 </p>
                 {!canProceed && (
                   <p className="text-sm text-amber-600">
-                    建议至少添加 {Math.max(0, 3 - realSamples.length)} 条正常标题和 {Math.max(0, 3 - fakeSamples.length)} 条标题党以获得更好的训练效果
+                    建议至少添加 {Math.max(0, 3 - normalSamples.length)} 条正常标题和 {Math.max(0, 3 - clickbaitSamples.length)} 条标题党以获得更好的训练效果
                   </p>
                 )}
               </div>
@@ -297,8 +350,8 @@ function App() {
             onStartTesting={() => {
               setCurrentStep(2);
             }}
-            realSamplesCount={realSamples.length}
-            fakeSamplesCount={fakeSamples.length}
+            normalSamplesCount={normalSamples.length}
+            clickbaitSamplesCount={clickbaitSamples.length}
             onGoToDataCollection={() => {
               setCurrentStep(0);
             }}

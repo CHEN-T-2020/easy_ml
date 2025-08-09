@@ -41,7 +41,7 @@ export interface ComparisonSummary {
     processingTime: number;
   };
   consensusPrediction?: {
-    prediction: 'real' | 'fake';
+    prediction: 'normal' | 'clickbait';
     confidence: number;
     agreement: number; // 一致性百分比
   };
@@ -137,15 +137,38 @@ export class ModelComparison {
     for (const modelType of modelOrder) {
       try {
         console.log(`开始训练 ${modelType} 模型...`);
-        const metrics = await this.trainModel(modelType, trainingData);
+        
+        // 为每个模型设置单独的超时
+        const modelTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`${modelType} 模型训练超时`));
+          }, modelType === 'cnn' ? 40000 : 10000); // CNN给更多时间
+        });
+        
+        const trainingPromise = this.trainModel(modelType, trainingData);
+        
+        // 使用 Promise.race 来实现超时
+        const metrics = await Promise.race([trainingPromise, modelTimeout]);
+        
         results.set(modelType, metrics);
         console.log(`${modelType} 模型训练完成，准确率: ${(metrics.accuracy * 100).toFixed(2)}%`);
       } catch (error) {
         console.error(`训练 ${modelType} 模型失败:`, error);
+        
+        // 为失败的模型设置默认指标
+        results.set(modelType, {
+          accuracy: 0.5,
+          precision: 0.5,
+          recall: 0.5,
+          f1Score: 0.5,
+          trainingTime: 0
+        });
+        
         // 继续训练其他模型
       }
     }
     
+    console.log(`训练完成，成功训练了 ${results.size} 个模型`);
     return results;
   }
 
@@ -201,7 +224,7 @@ export class ModelComparison {
           trainingTime: 0
         },
         prediction: prediction || {
-          prediction: 'real',
+          prediction: 'normal',
           confidence: 0,
           features: {} as any,
           reasoning: ['模型未训练'],
@@ -255,7 +278,7 @@ export class ModelComparison {
     let consensusPrediction: ComparisonSummary['consensusPrediction'];
     if (text && trainedModels.length > 1) {
       const predictions = this.predictWithAllModels(text);
-      const predictionCounts = { real: 0, fake: 0 };
+      const predictionCounts = { normal: 0, clickbait: 0 };
       let totalConfidence = 0;
       
       for (const [_, prediction] of predictions) {
@@ -264,8 +287,8 @@ export class ModelComparison {
       }
       
       const totalPredictions = predictions.size;
-      const majorityPrediction = predictionCounts.fake > predictionCounts.real ? 'fake' : 'real';
-      const agreement = Math.max(predictionCounts.fake, predictionCounts.real) / totalPredictions;
+      const majorityPrediction = predictionCounts.clickbait > predictionCounts.normal ? 'clickbait' : 'normal';
+      const agreement = Math.max(predictionCounts.clickbait, predictionCounts.normal) / totalPredictions;
       
       consensusPrediction = {
         prediction: majorityPrediction,

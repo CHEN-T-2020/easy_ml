@@ -56,10 +56,10 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
       });
     }
 
-    const realSamples = samples.filter(s => s.label === 'real');
-    const fakeSamples = samples.filter(s => s.label === 'fake');
+    const normalSamples = samples.filter(s => s.label === 'normal');
+    const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
 
-    if (realSamples.length === 0 || fakeSamples.length === 0) {
+    if (normalSamples.length === 0 || clickbaitSamples.length === 0) {
       return res.status(400).json({
         success: false,
         message: '需要同时包含正常标题和标题党样本'
@@ -113,10 +113,10 @@ router.post('/models/train-all', async (req: Request, res: Response) => {
       });
     }
 
-    const realSamples = samples.filter(s => s.label === 'real');
-    const fakeSamples = samples.filter(s => s.label === 'fake');
+    const normalSamples = samples.filter(s => s.label === 'normal');
+    const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
 
-    if (realSamples.length < 3 || fakeSamples.length < 3) {
+    if (normalSamples.length < 3 || clickbaitSamples.length < 3) {
       return res.status(400).json({
         success: false,
         message: '每个类别至少需要3个样本'

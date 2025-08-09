@@ -62,12 +62,47 @@ interface ComparisonSummary {
 }
 
 const ModelComparison: React.FC = () => {
-  const [models, setModels] = useState<{[key: string]: ModelInfo}>({});
-  const [comparisonResults, setComparisonResults] = useState<ModelComparisonResult[]>([]);
-  const [summary, setSummary] = useState<ComparisonSummary | null>(null);
-  const [testText, setTestText] = useState('');
+  const [models, setModels] = useState<{[key: string]: ModelInfo}>(() => {
+    const saved = localStorage.getItem('comparison_models');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [comparisonResults, setComparisonResults] = useState<ModelComparisonResult[]>(() => {
+    const saved = localStorage.getItem('comparison_results');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [summary, setSummary] = useState<ComparisonSummary | null>(() => {
+    const saved = localStorage.getItem('comparison_summary');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [testText, setTestText] = useState(() => {
+    return localStorage.getItem('comparison_testText') || '';
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [trainingStatus, setTrainingStatus] = useState<{[key: string]: boolean}>({});
+  const [trainingStatus, setTrainingStatus] = useState<{[key: string]: boolean}>(() => {
+    const saved = localStorage.getItem('comparison_trainingStatus');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // 保存状态到localStorage
+  useEffect(() => {
+    localStorage.setItem('comparison_models', JSON.stringify(models));
+  }, [models]);
+
+  useEffect(() => {
+    localStorage.setItem('comparison_results', JSON.stringify(comparisonResults));
+  }, [comparisonResults]);
+
+  useEffect(() => {
+    localStorage.setItem('comparison_summary', JSON.stringify(summary));
+  }, [summary]);
+
+  useEffect(() => {
+    localStorage.setItem('comparison_testText', testText);
+  }, [testText]);
+
+  useEffect(() => {
+    localStorage.setItem('comparison_trainingStatus', JSON.stringify(trainingStatus));
+  }, [trainingStatus]);
 
   // 获取模型信息
   useEffect(() => {
@@ -362,7 +397,7 @@ const ModelComparison: React.FC = () => {
                         <span>训练时间</span>
                         <span>{result.metrics.trainingTime}ms</span>
                       </div>
-                      {result.prediction.processingTime && (
+                      {result.prediction.processingTime !== undefined && (
                         <div className="metric">
                           <span>预测时间</span>
                           <span>{result.prediction.processingTime}ms</span>

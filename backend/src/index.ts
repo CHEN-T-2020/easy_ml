@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import textSamplesRouter from './routes/textSamples';
 import mlRouter from './routes/ml';
 import modelComparisonRouter from './routes/modelComparison';
+import datasetManagerRouter from './routes/datasetManager';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/text-samples', textSamplesRouter);
 app.use('/api/ml', mlRouter);
 app.use('/api/model-comparison', modelComparisonRouter);
+app.use('/api/data-manager', datasetManagerRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: '标题党识别平台 API 服务已启动' });
