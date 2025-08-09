@@ -80,6 +80,36 @@ router.post('/', (req: Request, res: Response) => {
   }
 });
 
+// 清除所有文本样本数据（必须放在 /:id 路由之前）
+router.delete('/clear', (req: Request, res: Response) => {
+  try {
+    const originalCount = samples.length;
+    
+    // 清空samples数组
+    samples.length = 0;
+    
+    // 重置ID计数器
+    nextId = 1;
+    
+    res.json({
+      success: true,
+      message: `已清除${originalCount}条文本样本，数据库已重置`,
+      data: {
+        clearedCount: originalCount,
+        currentCount: samples.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('清除文本样本失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '清除文本样本失败',
+      error: error instanceof Error ? error.message : '未知错误'
+    });
+  }
+});
+
 // 删除文本样本
 router.delete('/:id', (req: Request, res: Response) => {
   try {

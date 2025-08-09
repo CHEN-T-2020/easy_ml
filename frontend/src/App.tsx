@@ -96,16 +96,46 @@ function App() {
     saveStateToStorage();
   }, [currentStep, normalNewsText, clickbaitNewsText]);
 
-  // 清除所有保存的状态（重置功能）
-  const clearAllSavedState = () => {
-    const keys = [
-      'app_currentStep', 'app_normalNewsText', 'app_clickbaitNewsText',
-      'training_status', 'training_isPolling',
-      'testing_testText', 'testing_prediction', 'testing_history',
-      'comparison_models', 'comparison_results', 'comparison_summary', 
-      'comparison_testText', 'comparison_trainingStatus'
-    ];
-    keys.forEach(key => localStorage.removeItem(key));
+  // 清除所有保存的状态和数据（重置功能）
+  const clearAllSavedState = async () => {
+    try {
+      // 1. 清除localStorage状态
+      const keys = [
+        'app_currentStep', 'app_normalNewsText', 'app_clickbaitNewsText',
+        'training_status', 'training_isPolling',
+        'testing_testText', 'testing_prediction', 'testing_history',
+        'comparison_models', 'comparison_results', 'comparison_summary', 
+        'comparison_testText', 'comparison_trainingStatus'
+      ];
+      keys.forEach(key => localStorage.removeItem(key));
+      
+      // 2. 清除后端数据和模型
+      const clearPromises = [
+        // 清除所有文本样本数据
+        fetch('http://localhost:3001/api/text-samples/clear', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        // 重置ML模型
+        fetch('http://localhost:3001/api/ml/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        // 重置模型对比
+        fetch('http://localhost:3001/api/model-comparison/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}'
+        })
+      ];
+      
+      await Promise.allSettled(clearPromises);
+      console.log('所有数据和状态已清除');
+      
+    } catch (error) {
+      console.error('清除数据时出错:', error);
+      // 即使出错也继续重置前端状态
+    }
   };
 
   // 获取当前样本数据
@@ -215,14 +245,28 @@ function App() {
               <p className="text-gray-600">学习识别诱导性标题，培养媒体素养</p>
             </div>
             <button
-              onClick={() => {
-                if (window.confirm('确定要重置所有数据和进度吗？这将清除所有训练结果和测试历史。')) {
-                  clearAllSavedState();
-                  window.location.reload();
+              onClick={async () => {
+                if (window.confirm('确定要重置所有数据和进度吗？这将清除：\n• 所有文本样本数据\n• 训练模型和结果\n• 测试历史记录\n• 页面状态\n\n此操作不可撤销！')) {
+                  try {
+                    // 显示加载状态
+                    const originalText = document.activeElement?.textContent;
+                    if (document.activeElement) {
+                      (document.activeElement as HTMLElement).textContent = '重置中...';
+                    }
+                    
+                    await clearAllSavedState();
+                    
+                    // 重置完成后刷新页面
+                    window.location.reload();
+                  } catch (error) {
+                    console.error('重置失败:', error);
+                    alert('重置过程中出现错误，请手动刷新页面');
+                    window.location.reload();
+                  }
                 }
               }}
-              className="text-sm text-gray-500 hover:text-gray-700 underline"
-              title="重置所有状态"
+              className="text-sm text-gray-500 hover:text-gray-700 underline hover:text-red-600 transition-colors"
+              title="重置所有数据和状态"
             >
               重置
             </button>
