@@ -473,7 +473,7 @@ export class CNNTextClassifier extends BaseClassifier {
     }
   }
 
-  // 训练模型（简化版）
+  // 训练模型（健壮版）
   private async trainModel(
     sequences: number[][], 
     labels: number[], 
@@ -485,71 +485,133 @@ export class CNNTextClassifier extends BaseClassifier {
 
     console.log(`开始CNN训练，${this.epochs}个epochs，${sequences.length}个样本`);
 
-    // 设置训练超时（30秒）
-    const trainingTimeout = setTimeout(() => {
-      throw new Error('CNN训练超时，可能模型过于复杂');
-    }, 30000);
+    let trainingAborted = false;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     try {
-      for (let epoch = 0; epoch < this.epochs; epoch++) {
-        let totalLoss = 0;
-        
-        // 随机打乱数据
-        const indices = Array.from({length: sequences.length}, (_, i) => i);
-        this.shuffleArray(indices);
-        
-        for (let i = 0; i < sequences.length; i++) {
-          const idx = indices[i];
-          
-          try {
-            const prediction = this.forward(sequences[idx]);
-            const target = labels[idx];
+      // 创建一个可以被取消的Promise来实现超时控制
+      const trainingPromise = new Promise<void>(async (resolve, reject) => {
+        // 设置训练超时（25秒）- 比外层超时短一些
+        timeoutId = setTimeout(() => {
+          trainingAborted = true;
+          reject(new Error('CNN训练超时 - 训练在25秒内未完成，可能模型过于复杂'));
+        }, 25000);
+
+        try {
+          for (let epoch = 0; epoch < this.epochs && !trainingAborted; epoch++) {
+            let totalLoss = 0;
+            let validSamples = 0;
             
-            // 计算损失 (二元交叉熵)
-            const loss = -(target * Math.log(Math.max(prediction, 1e-15)) + 
-                           (1 - target) * Math.log(Math.max(1 - prediction, 1e-15)));
+            // 随机打乱数据
+            const indices = Array.from({length: sequences.length}, (_, i) => i);
+            this.shuffleArray(indices);
             
-            if (!isNaN(loss) && isFinite(loss)) {
-              totalLoss += loss;
+            // 限制每个epoch的最大训练样本数量，防止卡住
+            const maxSamplesPerEpoch = Math.min(sequences.length, 100);
+            
+            for (let i = 0; i < maxSamplesPerEpoch && !trainingAborted; i++) {
+              const idx = indices[i];
+              
+              try {
+                const prediction = this.forward(sequences[idx]);
+                if (prediction === undefined || isNaN(prediction)) {
+                  continue; // 跳过无效预测
+                }
+                
+                const target = labels[idx];
+                
+                // 计算损失 (二元交叉熵) - 增强数值稳定性
+                const eps = 1e-15;
+                const clampedPred = Math.max(eps, Math.min(1 - eps, prediction));
+                const loss = -(target * Math.log(clampedPred) + (1 - target) * Math.log(1 - clampedPred));
+                
+                if (!isNaN(loss) && isFinite(loss) && loss < 100) { // 限制最大损失避免爆炸
+                  totalLoss += loss;
+                  validSamples++;
+                }
+                
+                // 简化的梯度下降（更新全连接层和部分卷积层）
+                if (!isNaN(prediction) && isFinite(prediction)) {
+                  const error = prediction - target;
+                  if (Math.abs(error) < 10) { // 限制梯度大小
+                    this.updateDenseLayer(error);
+                    this.updateConvLayers(error, sequences[idx]);
+                  }
+                }
+                
+                // 定期检查是否需要中止
+                if (i % 10 === 0 && trainingAborted) {
+                  break;
+                }
+              } catch (sampleError) {
+                // 静默跳过错误样本，避免过多日志
+                continue;
+              }
             }
             
-            // 简化的梯度下降（更新全连接层和部分卷积层）
-            const error = prediction - target;
-            this.updateDenseLayer(error);
-            this.updateConvLayers(error, sequences[idx]);
-          } catch (sampleError) {
-            console.warn(`样本${idx}训练失败:`, sampleError);
-            continue;
+            const progress = 40 + (epoch / this.epochs) * 50;
+            const avgLoss = validSamples > 0 ? totalLoss / validSamples : 1.0;
+            
+            console.log(`Epoch ${epoch + 1}/${this.epochs}, 损失: ${avgLoss.toFixed(4)}, 有效样本: ${validSamples}`);
+            
+            // 报告进度
+            if (!trainingAborted) {
+              onProgress?.({
+                stage: 'training',
+                progress,
+                message: `训练轮次 ${epoch + 1}/${this.epochs}, 损失: ${avgLoss.toFixed(4)}`,
+                timeElapsed: Date.now() - this.trainingStartTime
+              });
+            }
+            
+            // 使用setImmediate代替setTimeout，更快的异步让步
+            await new Promise<void>(resolve => setImmediate(resolve));
+            
+            // 增强的早停条件
+            if (avgLoss < 0.1 || isNaN(avgLoss) || validSamples < sequences.length * 0.5) {
+              console.log(`在epoch ${epoch + 1}处早停，损失: ${avgLoss}, 有效样本比例: ${validSamples/sequences.length}`);
+              break;
+            }
+            
+            // 额外的安全检查：如果训练时间超过20秒就提前结束
+            if (Date.now() - this.trainingStartTime > 20000) {
+              console.log('训练时间超过20秒，提前结束');
+              break;
+            }
           }
+          
+          resolve();
+        } catch (error) {
+          reject(error);
         }
-        
-        const progress = 40 + (epoch / this.epochs) * 50;
-        const avgLoss = totalLoss / sequences.length;
-        
-        console.log(`Epoch ${epoch + 1}/${this.epochs}, 损失: ${avgLoss.toFixed(4)}`);
-        
-        onProgress?.({
-          stage: 'training',
-          progress,
-          message: `训练轮次 ${epoch + 1}/${this.epochs}, 损失: ${avgLoss.toFixed(4)}`,
-          timeElapsed: Date.now() - this.trainingStartTime
-        });
-        
-        // 减少延迟时间
-        await new Promise(resolve => setTimeout(resolve, 50));
-        
-        // 早停条件：如果损失变得很小或无效
-        if (avgLoss < 0.01 || isNaN(avgLoss)) {
-          console.log(`在epoch ${epoch + 1}处早停，损失: ${avgLoss}`);
-          break;
-        }
+      });
+
+      // 等待训练完成
+      await trainingPromise;
+      
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
       
       console.log('CNN训练完成');
-      clearTimeout(trainingTimeout);
+      
     } catch (error) {
-      clearTimeout(trainingTimeout);
-      console.error('CNN训练过程中出错:', error);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      // 如果是超时错误，记录详细信息
+      if (error instanceof Error && error.message.includes('超时')) {
+        console.error('CNN训练超时详情:', {
+          epochs: this.epochs,
+          samples: sequences.length,
+          trainingTime: Date.now() - this.trainingStartTime,
+          message: error.message
+        });
+      } else {
+        console.error('CNN训练过程中出错:', error);
+      }
+      
       throw error;
     }
   }

@@ -109,9 +109,19 @@ export class ModelComparison {
     this.isTraining.set(modelType, true);
     
     try {
-      const metrics = await model.train(trainingData, (progress) => {
+      // 为单个模型训练添加超时保护
+      const trainingTimeout = modelType === 'cnn' ? 30000 : 8000; // CNN 30秒，其他8秒
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`${modelType} 模型训练超时 - 单个训练超过 ${trainingTimeout/1000} 秒`));
+        }, trainingTimeout);
+      });
+
+      const trainingPromise = model.train(trainingData, (progress) => {
         this.trainingProgress.set(modelType, progress);
       });
+
+      const metrics = await Promise.race([trainingPromise, timeoutPromise]);
       
       this.metrics.set(modelType, metrics);
       this.isTraining.set(modelType, false);
@@ -121,6 +131,16 @@ export class ModelComparison {
     } catch (error) {
       this.isTraining.set(modelType, false);
       this.trainingProgress.set(modelType, null);
+      
+      // 记录详细的错误信息
+      if (error instanceof Error && error.message.includes('超时')) {
+        console.error(`${modelType} 模型训练超时:`, {
+          modelType,
+          sampleCount: trainingData.length,
+          error: error.message
+        });
+      }
+      
       throw error;
     }
   }
@@ -141,8 +161,8 @@ export class ModelComparison {
         // 为每个模型设置单独的超时
         const modelTimeout = new Promise<never>((_, reject) => {
           setTimeout(() => {
-            reject(new Error(`${modelType} 模型训练超时`));
-          }, modelType === 'cnn' ? 40000 : 10000); // CNN给更多时间
+            reject(new Error(`${modelType} 模型训练超时 - 已达到最大时间限制`));
+          }, modelType === 'cnn' ? 35000 : 10000); // CNN给35秒，与内部超时配合
         });
         
         const trainingPromise = this.trainModel(modelType, trainingData);
