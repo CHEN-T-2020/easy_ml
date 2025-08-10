@@ -56,15 +56,25 @@ export class LogisticRegressionClassifier extends BaseClassifier {
   ): Promise<TrainingMetrics> {
     this.trainingStartTime = Date.now();
     
-    if (trainingData.length < 2) {
-      throw new Error('逻辑回归模型需要至少2个训练样本');
+    if (trainingData.length < 4) {
+      throw new Error('逻辑回归模型需要至少4个训练样本（用于训练测试分割）');
     }
 
-    const normalData = trainingData.filter(d => d.label === 'normal');
-    const clickbaitData = trainingData.filter(d => d.label === 'clickbait');
+    // 分割数据集为训练集和测试集
+    onProgress?.({
+      stage: 'data_split',
+      progress: 10,
+      message: '正在分割数据集...',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
 
-    if (normalData.length === 0 || clickbaitData.length === 0) {
-      throw new Error('每个类别至少需要1个样本');
+    const { trainData, testData, splitInfo } = this.splitDataset(trainingData, 0.2, 42);
+    
+    const normalTrainData = trainData.filter(d => d.label === 'normal');
+    const clickbaitTrainData = trainData.filter(d => d.label === 'clickbait');
+
+    if (normalTrainData.length === 0 || clickbaitTrainData.length === 0) {
+      throw new Error('训练集中每个类别至少需要1个样本');
     }
 
     // 1. 特征提取
@@ -75,8 +85,8 @@ export class LogisticRegressionClassifier extends BaseClassifier {
       timeElapsed: Date.now() - this.trainingStartTime
     });
 
-    const features = this.extractAllFeatures(trainingData);
-    const labels = trainingData.map(d => d.label === 'clickbait' ? 1 : 0);
+    const features = this.extractAllFeatures(trainData);
+    const labels = trainData.map(d => d.label === 'clickbait' ? 1 : 0);
 
     // 2. 特征标准化
     onProgress?.({
@@ -110,7 +120,7 @@ export class LogisticRegressionClassifier extends BaseClassifier {
 
     this.isTrained = true;
     
-    // 5. 评估模型
+    // 5. 评估模型性能
     onProgress?.({
       stage: 'evaluation',
       progress: 90,
@@ -118,14 +128,48 @@ export class LogisticRegressionClassifier extends BaseClassifier {
       timeElapsed: Date.now() - this.trainingStartTime
     });
 
-    const metrics = await this.getValidationMetrics(trainingData);
-    metrics.trainingTime = Date.now() - this.trainingStartTime;
+    // 分别在训练集和测试集上评估
+    const trainMetrics = this.evaluateOnDataset(trainData);
+    const testMetrics = this.evaluateOnDataset(testData);
+    
+    // 检测过拟合
+    const overfitInfo = this.detectOverfitting(trainMetrics, testMetrics);
+    
+    const trainingTime = Date.now() - this.trainingStartTime;
+    
+    // 构建完整的指标对象
+    const metrics: TrainingMetrics = {
+      // 训练集指标
+      trainAccuracy: trainMetrics.accuracy,
+      trainPrecision: trainMetrics.precision,
+      trainRecall: trainMetrics.recall,
+      trainF1Score: trainMetrics.f1Score,
+      
+      // 测试集指标
+      testAccuracy: testMetrics.accuracy,
+      testPrecision: testMetrics.precision,
+      testRecall: testMetrics.recall,
+      testF1Score: testMetrics.f1Score,
+      
+      // 通用指标（使用测试集指标保持向后兼容）
+      accuracy: testMetrics.accuracy,
+      precision: testMetrics.precision,
+      recall: testMetrics.recall,
+      f1Score: testMetrics.f1Score,
+      trainingTime,
+      
+      // 数据集信息
+      datasetInfo: splitInfo,
+      
+      // 过拟合检测
+      overfit: overfitInfo
+    };
 
     onProgress?.({
       stage: 'completed',
       progress: 100,
       message: '逻辑回归模型训练完成',
-      timeElapsed: Date.now() - this.trainingStartTime
+      timeElapsed: trainingTime
     });
 
     return metrics;
@@ -459,7 +503,7 @@ export class LogisticRegressionClassifier extends BaseClassifier {
   ): string[] {
     const reasoning: string[] = [];
     
-    reasoning.push(`逻辑回归预测概率: ${(probability * 100).toFixed(1)}%`);
+    reasoning.push(`标题党概率: ${(probability * 100).toFixed(1)}%, 正常概率: ${((1-probability) * 100).toFixed(1)}%`);
     
     if (probability > 0.7) {
       reasoning.push('模型认为这是标题党的可能性很高');
@@ -491,11 +535,4 @@ export class LogisticRegressionClassifier extends BaseClassifier {
     return reasoning;
   }
 
-  /**
-   * 获取验证指标
-   */
-  private async getValidationMetrics(data: TrainingData[]): Promise<TrainingMetrics> {
-    const { ModelUtils } = await import('../utils/ModelUtils');
-    return ModelUtils.getValidationMetrics(this, data, 0.75);
-  }
 }

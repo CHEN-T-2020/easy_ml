@@ -83,15 +83,25 @@ export class RandomForestClassifier extends BaseClassifier {
   ): Promise<TrainingMetrics> {
     this.trainingStartTime = Date.now();
     
-    if (trainingData.length < 4) {
-      throw new Error('训练数据不足，至少需要4个样本（每类至少2个）');
+    if (trainingData.length < 8) {
+      throw new Error('随机森林需要至少8个训练样本（用于训练测试分割）');
     }
 
-    const normalData = trainingData.filter(d => d.label === 'normal');
-    const clickbaitData = trainingData.filter(d => d.label === 'clickbait');
+    // 分割数据集为训练集和测试集
+    onProgress?.({
+      stage: 'data_split',
+      progress: 5,
+      message: '正在分割数据集...',
+      timeElapsed: Date.now() - this.trainingStartTime
+    });
 
-    if (normalData.length === 0 || clickbaitData.length === 0) {
-      throw new Error('需要同时包含正常标题和标题党样本');
+    const { trainData, testData, splitInfo } = this.splitDataset(trainingData, 0.2, 42);
+    
+    const normalTrainData = trainData.filter(d => d.label === 'normal');
+    const clickbaitTrainData = trainData.filter(d => d.label === 'clickbait');
+
+    if (normalTrainData.length === 0 || clickbaitTrainData.length === 0) {
+      throw new Error('训练集中每个类别至少需要1个样本');
     }
 
     // 训练TF-IDF
@@ -102,14 +112,14 @@ export class RandomForestClassifier extends BaseClassifier {
       timeElapsed: Date.now() - this.trainingStartTime
     });
 
-    const allTexts = trainingData.map(d => d.text);
+    const allTexts = trainData.map(d => d.text);
     this.featureExtractor.trainTfIdf(allTexts);
 
     // 提取特征向量
     const features: number[][] = [];
     const labels: number[] = []; // 0 = normal, 1 = clickbait
 
-    for (const sample of trainingData) {
+    for (const sample of trainData) {
       const textFeatures = this.featureExtractor.extractFeatures(sample.text);
       const featureVector = this.featureExtractor.getFeatureVector(textFeatures);
       features.push(featureVector);
@@ -152,15 +162,48 @@ export class RandomForestClassifier extends BaseClassifier {
 
     this.isTrained = true;
     
-    // 计算验证指标
-    const metrics = await this.getValidationMetrics(trainingData);
-    metrics.trainingTime = Date.now() - this.trainingStartTime;
+    // 分别在训练集和测试集上评估
+    const trainMetrics = this.evaluateOnDataset(trainData);
+    const testMetrics = this.evaluateOnDataset(testData);
+    
+    // 检测过拟合
+    const overfitInfo = this.detectOverfitting(trainMetrics, testMetrics);
+    
+    const trainingTime = Date.now() - this.trainingStartTime;
+    
+    // 构建完整的指标对象
+    const metrics: TrainingMetrics = {
+      // 训练集指标
+      trainAccuracy: trainMetrics.accuracy,
+      trainPrecision: trainMetrics.precision,
+      trainRecall: trainMetrics.recall,
+      trainF1Score: trainMetrics.f1Score,
+      
+      // 测试集指标
+      testAccuracy: testMetrics.accuracy,
+      testPrecision: testMetrics.precision,
+      testRecall: testMetrics.recall,
+      testF1Score: testMetrics.f1Score,
+      
+      // 通用指标（使用测试集指标保持向后兼容）
+      accuracy: testMetrics.accuracy,
+      precision: testMetrics.precision,
+      recall: testMetrics.recall,
+      f1Score: testMetrics.f1Score,
+      trainingTime,
+      
+      // 数据集信息
+      datasetInfo: splitInfo,
+      
+      // 过拟合检测
+      overfit: overfitInfo
+    };
 
     onProgress?.({
       stage: 'completed',
       progress: 100,
       message: '随机森林训练完成',
-      timeElapsed: Date.now() - this.trainingStartTime
+      timeElapsed: trainingTime
     });
 
     return metrics;
@@ -527,8 +570,4 @@ export class RandomForestClassifier extends BaseClassifier {
   /**
    * 获取验证指标（用holdout方法）
    */
-  private async getValidationMetrics(data: TrainingData[]): Promise<TrainingMetrics> {
-    const { ModelUtils } = await import('../utils/ModelUtils');
-    return ModelUtils.getValidationMetrics(this, data, 0.88); // 随机森林过拟合较少
-  }
 }

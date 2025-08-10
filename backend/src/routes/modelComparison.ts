@@ -42,7 +42,7 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
   try {
     const modelType = req.params.modelType as ModelType;
     
-    if (!['random_forest', 'cnn'].includes(modelType)) {
+    if (!['random_forest', 'logistic_regression'].includes(modelType)) {
       return res.status(400).json({
         success: false,
         message: '无效的模型类型'
@@ -108,10 +108,10 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
 router.post('/models/train-all', async (req: Request, res: Response) => {
   try {
     const samples = fileStorage.getAllSamples();
-    if (samples.length < 10) {
+    if (samples.length < 8) {
       return res.status(400).json({
         success: false,
-        message: '训练所有模型需要至少10个样本（CNN模型要求）'
+        message: '训练所有模型需要至少8个样本'
       });
     }
 
@@ -143,7 +143,7 @@ router.post('/models/train-all', async (req: Request, res: Response) => {
       message: '开始训练所有模型',
       data: {
         trainingStarted: true,
-        totalModels: 3
+        totalModels: 2
       }
     });
 
@@ -382,7 +382,7 @@ router.post('/reset', (req: Request, res: Response) => {
   try {
     const { modelType } = req.body;
     
-    if (modelType && ['random_forest', 'cnn'].includes(modelType)) {
+    if (modelType && ['random_forest', 'logistic_regression'].includes(modelType)) {
       modelComparison.resetModel(modelType as ModelType);
       res.json({
         success: true,

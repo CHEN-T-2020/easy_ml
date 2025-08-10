@@ -12,11 +12,43 @@ interface ModelInfo {
 }
 
 interface TrainingMetrics {
+  // 训练集指标
+  trainAccuracy: number;
+  trainPrecision: number;
+  trainRecall: number;
+  trainF1Score: number;
+  
+  // 测试集指标
+  testAccuracy: number;
+  testPrecision: number;
+  testRecall: number;
+  testF1Score: number;
+  
+  // 通用指标（保持向后兼容）
   accuracy: number;
   precision: number;
   recall: number;
   f1Score: number;
   trainingTime: number;
+  
+  // 数据集信息
+  datasetInfo: {
+    totalSamples: number;
+    trainSize: number;
+    testSize: number;
+    splitRatio: number;
+    classDistribution: {
+      normal: { train: number; test: number };
+      clickbait: { train: number; test: number };
+    };
+  };
+  
+  // 模型性能差异（过拟合检测）
+  overfit: {
+    accuracyGap: number;  // 训练集 - 测试集准确率差异
+    f1Gap: number;        // 训练集 - 测试集F1差异
+    isOverfitting: boolean; // 是否存在过拟合
+  };
 }
 
 interface ClassificationResult {
@@ -365,20 +397,89 @@ const ModelComparison: React.FC = () => {
                     </div>
                     
                     <div className="metrics">
-                      <div className="metric">
-                        <span>准确率</span>
-                        <span>{(result.metrics.accuracy * 100).toFixed(1)}%</span>
-                      </div>
-                      <div className="metric">
-                        <span>训练时间</span>
-                        <span>{result.metrics.trainingTime}ms</span>
-                      </div>
-                      {result.prediction.processingTime !== undefined && (
-                        <div className="metric">
-                          <span>预测时间</span>
-                          <span>{result.prediction.processingTime}ms</span>
+                      {/* 数据集信息 */}
+                      {result.metrics.datasetInfo && (
+                        <div className="dataset-info">
+                          <h5>📊 数据集信息</h5>
+                          <div className="dataset-stats">
+                            <span>总样本: {result.metrics.datasetInfo.totalSamples}</span>
+                            <span>训练集: {result.metrics.datasetInfo.trainSize}</span>
+                            <span>测试集: {result.metrics.datasetInfo.testSize}</span>
+                            <span>分割比例: {Math.round((1-result.metrics.datasetInfo.splitRatio)*100)}%/{Math.round(result.metrics.datasetInfo.splitRatio*100)}%</span>
+                          </div>
                         </div>
                       )}
+                      
+                      {/* 性能指标对比 */}
+                      <div className="performance-comparison">
+                        <h5>🎯 性能对比</h5>
+                        <div className="metrics-grid">
+                          <div className="metric-group">
+                            <h6>训练集表现</h6>
+                            <div className="metric">
+                              <span>准确率</span>
+                              <span>{(result.metrics.trainAccuracy * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>精确率</span>
+                              <span>{(result.metrics.trainPrecision * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>召回率</span>
+                              <span>{(result.metrics.trainRecall * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>F1分数</span>
+                              <span>{(result.metrics.trainF1Score * 100).toFixed(1)}%</span>
+                            </div>
+                          </div>
+                          
+                          <div className="metric-group">
+                            <h6>测试集表现</h6>
+                            <div className="metric">
+                              <span>准确率</span>
+                              <span>{(result.metrics.testAccuracy * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>精确率</span>
+                              <span>{(result.metrics.testPrecision * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>召回率</span>
+                              <span>{(result.metrics.testRecall * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="metric">
+                              <span>F1分数</span>
+                              <span>{(result.metrics.testF1Score * 100).toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* 过拟合检测 */}
+                        {result.metrics.overfit && (
+                          <div className={`overfit-indicator ${result.metrics.overfit.isOverfitting ? 'warning' : 'good'}`}>
+                            {result.metrics.overfit.isOverfitting ? (
+                              <span>⚠️ 可能存在过拟合 (准确率差异: {(result.metrics.overfit.accuracyGap * 100).toFixed(1)}%)</span>
+                            ) : (
+                              <span>✅ 泛化良好 (准确率差异: {(result.metrics.overfit.accuracyGap * 100).toFixed(1)}%)</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* 其他指标 */}
+                      <div className="additional-metrics">
+                        <div className="metric">
+                          <span>训练时间</span>
+                          <span>{result.metrics.trainingTime}ms</span>
+                        </div>
+                        {result.prediction.processingTime !== undefined && (
+                          <div className="metric">
+                            <span>预测时间</span>
+                            <span>{result.prediction.processingTime}ms</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="reasoning">

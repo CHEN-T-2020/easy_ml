@@ -1640,3 +1640,122 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 测试集功能新增样式 */
+.dataset-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.dataset-info h5 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dataset-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 0.8rem;
+}
+
+.dataset-stats span {
+  background: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-weight: 500;
+}
+
+.performance-comparison {
+  margin-bottom: 20px;
+}
+
+.performance-comparison h5 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.metric-group {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.metric-group h6 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.metric-group .metric {
+  margin-bottom: 8px;
+}
+
+.overfit-indicator {
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.overfit-indicator.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.overfit-indicator.good {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.additional-metrics {
+  border-top: 1px solid #e9ecef;
+  padding-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dataset-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .additional-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

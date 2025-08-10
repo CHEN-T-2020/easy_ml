@@ -175,11 +175,34 @@ export class ModelComparison {
         
         // 为失败的模型设置默认指标
         results.set(modelType, {
+          trainAccuracy: 0.5,
+          trainPrecision: 0.5,
+          trainRecall: 0.5,
+          trainF1Score: 0.5,
+          testAccuracy: 0.5,
+          testPrecision: 0.5,
+          testRecall: 0.5,
+          testF1Score: 0.5,
           accuracy: 0.5,
           precision: 0.5,
           recall: 0.5,
           f1Score: 0.5,
-          trainingTime: 0
+          trainingTime: 0,
+          datasetInfo: {
+            totalSamples: 0,
+            trainSize: 0,
+            testSize: 0,
+            splitRatio: 0.2,
+            classDistribution: {
+              normal: { train: 0, test: 0 },
+              clickbait: { train: 0, test: 0 }
+            }
+          },
+          overfit: {
+            accuracyGap: 0,
+            f1Gap: 0,
+            isOverfitting: false
+          }
         });
         
         // 继续训练其他模型
@@ -235,11 +258,34 @@ export class ModelComparison {
         modelType,
         modelInfo,
         metrics: metrics || {
+          trainAccuracy: 0,
+          trainPrecision: 0,
+          trainRecall: 0,
+          trainF1Score: 0,
+          testAccuracy: 0,
+          testPrecision: 0,
+          testRecall: 0,
+          testF1Score: 0,
           accuracy: 0,
           precision: 0,
           recall: 0,
           f1Score: 0,
-          trainingTime: 0
+          trainingTime: 0,
+          datasetInfo: {
+            totalSamples: 0,
+            trainSize: 0,
+            testSize: 0,
+            splitRatio: 0.2,
+            classDistribution: {
+              normal: { train: 0, test: 0 },
+              clickbait: { train: 0, test: 0 }
+            }
+          },
+          overfit: {
+            accuracyGap: 0,
+            f1Gap: 0,
+            isOverfitting: false
+          }
         },
         prediction: prediction || {
           prediction: 'normal',
