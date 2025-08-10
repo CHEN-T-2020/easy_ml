@@ -114,6 +114,7 @@ class StateManager {
   clearComparisonResults(): void {
     this.state.comparison.results = [];
     this.state.comparison.summary = null;
+    this.state.comparison.testText = ''; // 清空测试输入框
     this.saveState();
     this.notifyListeners();
   }

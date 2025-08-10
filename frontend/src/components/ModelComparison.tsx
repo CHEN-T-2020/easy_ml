@@ -66,11 +66,10 @@ const ModelComparison: React.FC = () => {
   const {
     models,
     results: comparisonResults,
-    // summary, // 暂时不用
     testText,
     trainingStatus,
     updateState,
-    // clearResults // 暂时不用
+    clearResults
   } = useComparisonState();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -200,8 +199,7 @@ const ModelComparison: React.FC = () => {
       const response = await fetch('http://localhost:3001/api/model-comparison/reset', { method: 'POST' });
       const data = await response.json();
       if (data.success) {
-        setComparisonResults([]);
-        setSummary(null);
+        clearResults(); // 使用状态管理器的清空方法
         fetchModelsInfo();
       }
     } catch (error) {

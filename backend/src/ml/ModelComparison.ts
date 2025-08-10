@@ -6,9 +6,9 @@ import {
   ModelInfo 
 } from './BaseClassifier';
 import { RandomForestClassifier } from './RandomForestClassifier';
-import { CNNTextClassifier } from './CNNTextClassifier';
+import { LogisticRegressionClassifier } from './LogisticRegressionClassifier';
 
-export type ModelType = 'random_forest' | 'cnn';
+export type ModelType = 'random_forest' | 'logistic_regression';
 
 export interface ModelComparisonResult {
   modelType: ModelType;
@@ -66,7 +66,7 @@ export class ModelComparison {
 
   private initializeModels(): void {
     this.models.set('random_forest', new RandomForestClassifier());
-    this.models.set('cnn', new CNNTextClassifier());
+    this.models.set('logistic_regression', new LogisticRegressionClassifier());
 
     // 初始化训练状态
     for (const modelType of this.models.keys()) {
@@ -108,7 +108,7 @@ export class ModelComparison {
     
     try {
       // 为单个模型训练添加超时保护
-      const trainingTimeout = modelType === 'cnn' ? 30000 : 8000; // CNN 30秒，其他8秒
+      const trainingTimeout = modelType === 'logistic_regression' ? 15000 : 8000; // 逻辑回归 15秒，其他8秒
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error(`${modelType} 模型训练超时 - 单个训练超过 ${trainingTimeout/1000} 秒`));
@@ -149,8 +149,8 @@ export class ModelComparison {
   async trainAllModels(trainingData: TrainingData[]): Promise<Map<ModelType, TrainingMetrics>> {
     const results = new Map<ModelType, TrainingMetrics>();
     
-    // 按复杂度顺序训练：随机森林 -> CNN
-    const modelOrder: ModelType[] = ['random_forest', 'cnn'];
+    // 按复杂度顺序训练：随机森林 -> 逻辑回归
+    const modelOrder: ModelType[] = ['random_forest', 'logistic_regression'];
     
     for (const modelType of modelOrder) {
       try {
@@ -160,7 +160,7 @@ export class ModelComparison {
         const modelTimeout = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error(`${modelType} 模型训练超时 - 已达到最大时间限制`));
-          }, modelType === 'cnn' ? 35000 : 10000); // CNN给35秒，与内部超时配合
+          }, modelType === 'logistic_regression' ? 20000 : 10000); // 逻辑回归给20秒，与内部超时配合
         });
         
         const trainingPromise = this.trainModel(modelType, trainingData);

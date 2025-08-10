@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "news-classifier-frontend",
   "builds": [
     {
       "src": "package.json",
@@ -10,19 +9,22 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/static/(.*)",
-      "headers": {
-        "cache-control": "s-maxage=31536000,immutable"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "cache-control",
+          "value": "s-maxage=31536000,immutable"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -38,11 +40,11 @@
     }
   ],
   "env": {
-    "REACT_APP_API_BASE_URL": "@api_base_url"
+    "REACT_APP_API_BASE_URL": "https://news-classifier-25071-737425a9fe2f.herokuapp.com/api"
   },
   "build": {
     "env": {
-      "REACT_APP_API_BASE_URL": "@api_base_url"
+      "REACT_APP_API_BASE_URL": "https://news-classifier-25071-737425a9fe2f.herokuapp.com/api"
     }
   }
 }

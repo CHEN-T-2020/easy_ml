@@ -5,6 +5,7 @@ import { SampleList } from './components/SampleList';
 import { FileUpload } from './components/FileUpload';
 import ModelComparison from './components/ModelComparison';
 import { api } from './utils/api';
+import { stateManager } from './utils/stateManager';
 
 interface TextSample {
   id: number;
@@ -39,20 +40,21 @@ function App() {
   // 监听状态变化并保存
   useEffect(() => {
     saveStateToStorage();
-  }, [currentStep, normalNewsText, clickbaitNewsText]);
+  }, [currentStep, normalNewsText, clickbaitNewsText, saveStateToStorage]);
 
   // 清除所有保存的状态和数据（重置功能）
   const clearAllSavedState = async () => {
     try {
       // 1. 清除localStorage状态
       const keys = [
-        'app_currentStep', 'app_normalNewsText', 'app_clickbaitNewsText',
-        'comparison_models', 'comparison_results', 'comparison_summary', 
-        'comparison_testText', 'comparison_trainingStatus'
+        'app_currentStep', 'app_normalNewsText', 'app_clickbaitNewsText'
       ];
       keys.forEach(key => localStorage.removeItem(key));
       
-      // 2. 清除后端数据和模型
+      // 2. 使用状态管理器清空对比状态
+      stateManager.clearState();
+      
+      // 3. 清除后端数据和模型
       const clearPromises = [
         // 清除所有文本样本数据
         api.clearAllSamples(),
