@@ -6,11 +6,14 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import { corsOptions, rateLimitConfig, helmetConfig } from './config/security';
-// 使用文件存储版本的路由
-import textSamplesRouter from './routes/textSamples-file';
-import mlRouter from './routes/ml';
-import modelComparisonRouter from './routes/modelComparison';
-import datasetManagerRouter from './routes/datasetManager';
+// 统一的文本样本路由（基于文件存储）
+import textSamplesRouter from './routes/textSamples';
+// 临时禁用可能有问题的路由
+// import mlRouter from './routes/ml';
+// 临时禁用 modelComparison 路由
+// import modelComparisonRouter from './routes/modelComparison';
+// TODO: datasetManager需要重构后再启用
+// import datasetManagerRouter from './routes/datasetManager';
 
 dotenv.config();
 
@@ -27,9 +30,10 @@ app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // 路由
 app.use('/api/text-samples', textSamplesRouter);
-app.use('/api/ml', mlRouter);
-app.use('/api/model-comparison', modelComparisonRouter);
-app.use('/api/data-manager', datasetManagerRouter);
+// app.use('/api/ml', mlRouter);
+// app.use('/api/model-comparison', modelComparisonRouter);
+// TODO: 启用数据集管理器
+// app.use('/api/data-manager', datasetManagerRouter);
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({ message: '标题党识别平台 API 服务已启动' });

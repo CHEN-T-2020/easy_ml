@@ -1,249 +1,155 @@
 import express, { Request, Response } from 'express';
-import { Router } from 'express';
+import { fileStorage } from '../database/FileStorage';
+import { TextSample } from '../types/common';
+import { ApiResponseHelper } from '../utils/ApiResponse';
+import { QualityScorer } from '../utils/QualityScorer';
 
-const router: Router = express.Router();
+const router = express.Router();
 
-interface TextSample {
-  id: number;
-  content: string;
-  label: 'normal' | 'clickbait';
-  wordCount: number;
-  qualityScore: number;
-  createdAt: Date;
-}
+// 获取所有样本
+router.get('/', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const samples = fileStorage.getAllSamples();
+  ApiResponseHelper.success(res, samples, '获取样本成功');
+}));
 
-let samples: TextSample[] = [];
-let nextId = 1;
+// 添加单个样本
+router.post('/', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const { content, label } = req.body;
 
-// 导出样本数据供ML模块使用
-export { samples };
+  if (!content || !label) {
+    return ApiResponseHelper.validationError(res, '内容和标签不能为空');
+  }
 
-// 获取所有文本样本
-router.get('/', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: samples,
-    total: samples.length
+  if (!['normal', 'clickbait'].includes(label)) {
+    return ApiResponseHelper.validationError(res, '标签必须是 normal 或 clickbait');
+  }
+
+  // 计算基本特征
+  const wordCount = content.trim().split(/\s+/).length;
+  const qualityScore = QualityScorer.calculateQualityScore(content, label);
+
+  const sample = fileStorage.addSample({
+    content: content.trim(),
+    label,
+    wordCount,
+    qualityScore
   });
-});
 
-// 添加新的文本样本
-router.post('/', (req: Request, res: Response) => {
-  try {
-    const { content, label } = req.body;
+  ApiResponseHelper.success(res, sample, '样本添加成功', 201);
+}));
 
-    if (!content || !label) {
-      return res.status(400).json({
-        success: false,
-        message: '内容和标签都是必需的'
-      });
-    }
+// 批量上传样本
+router.post('/batch', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const { texts, label } = req.body;
 
-    if (content.length < 10) {
-      return res.status(400).json({
-        success: false,
-        message: '文本内容至少需要10个字符'
-      });
-    }
+  if (!texts || !Array.isArray(texts) || texts.length === 0) {
+    return ApiResponseHelper.validationError(res, '文本数组不能为空');
+  }
 
-    if (!['normal', 'clickbait'].includes(label)) {
-      return res.status(400).json({
-        success: false,
-        message: '标签必须是 "normal" 或 "clickbait"'
-      });
-    }
+  if (!['normal', 'clickbait'].includes(label)) {
+    return ApiResponseHelper.validationError(res, '标签必须是 normal 或 clickbait');
+  }
 
-    const wordCount = content.length;
-    const qualityScore = calculateQualityScore(content);
+  const newSamples = texts.map(text => {
+    const content = text.trim();
+    const wordCount = content.split(/\s+/).length;
+    const qualityScore = QualityScorer.calculateQualityScore(content, label);
 
-    const newSample: TextSample = {
-      id: nextId++,
+    return {
       content,
       label,
       wordCount,
-      qualityScore,
-      createdAt: new Date()
+      qualityScore
     };
+  });
 
-    samples.push(newSample);
+  const addedSamples = fileStorage.addBatchSamples(newSamples);
 
-    res.status(201).json({
-      success: true,
-      data: newSample,
-      message: '文本样本添加成功'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: '服务器错误'
-    });
+  const stats = fileStorage.getStats();
+  
+  ApiResponseHelper.success(res, {
+    importedCount: addedSamples.length,
+    skippedCount: 0,
+    normalCount: stats.normalCount,
+    clickbaitCount: stats.clickbaitCount,
+    samples: addedSamples
+  }, `成功导入 ${addedSamples.length} 个样本`);
+}));
+
+// 清除所有样本数据 (必须放在 /:id 路由之前)
+router.delete('/clear', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const stats = fileStorage.getStats();
+  const originalCount = stats.total;
+  
+  // 清空所有样本数据
+  const cleared = fileStorage.clearAllSamples();
+  
+  if (cleared) {
+    ApiResponseHelper.success(res, {
+      clearedCount: originalCount,
+      currentCount: 0
+    }, `已清除${originalCount}条文本样本，数据库已重置`);
+  } else {
+    ApiResponseHelper.serverError(res, '清除文本样本失败');
   }
-});
+}));
 
-// 清除所有文本样本数据（必须放在 /:id 路由之前）
-router.delete('/clear', (req: Request, res: Response) => {
-  try {
-    const originalCount = samples.length;
-    
-    // 清空samples数组
-    samples.length = 0;
-    
-    // 重置ID计数器
-    nextId = 1;
-    
-    res.json({
-      success: true,
-      message: `已清除${originalCount}条文本样本，数据库已重置`,
-      data: {
-        clearedCount: originalCount,
-        currentCount: samples.length
-      }
-    });
-    
-  } catch (error) {
-    console.error('清除文本样本失败:', error);
-    res.status(500).json({
-      success: false,
-      message: '清除文本样本失败',
-      error: error instanceof Error ? error.message : '未知错误'
-    });
+// 删除样本
+router.delete('/:id', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const idParam = req.params.id;
+  const id = parseInt(idParam);
+  
+  if (isNaN(id)) {
+    return ApiResponseHelper.validationError(res, '无效的样本ID');
   }
-});
 
-// 删除文本样本
-router.delete('/:id', (req: Request, res: Response) => {
-  try {
-    const id = parseInt(req.params.id);
-    const index = samples.findIndex(sample => sample.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({
-        success: false,
-        message: '未找到该文本样本'
-      });
-    }
-
-    samples.splice(index, 1);
-
-    res.json({
-      success: true,
-      message: '文本样本删除成功'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: '服务器错误'
-    });
+  const deleted = fileStorage.deleteSample(id);
+  
+  if (deleted) {
+    ApiResponseHelper.success(res, null, '样本删除成功');
+  } else {
+    ApiResponseHelper.notFound(res, '未找到指定样本');
   }
-});
-
-// 批量添加文本样本
-router.post('/batch', (req: Request, res: Response) => {
-  try {
-    const { texts, label } = req.body;
-
-    if (!texts || !Array.isArray(texts) || !label) {
-      return res.status(400).json({
-        success: false,
-        message: '文本数组和标签都是必需的'
-      });
-    }
-
-    if (!['normal', 'clickbait'].includes(label)) {
-      return res.status(400).json({
-        success: false,
-        message: '标签必须是 "normal" 或 "clickbait"'
-      });
-    }
-
-    const validTexts = texts.filter(text => 
-      typeof text === 'string' && text.trim().length >= 10
-    );
-
-    if (validTexts.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: '没有有效的文本样本（每条至少10个字符）'
-      });
-    }
-
-    const newSamples: TextSample[] = validTexts.map(content => {
-      const trimmedContent = content.trim();
-      const wordCount = trimmedContent.length;
-      const qualityScore = calculateQualityScore(trimmedContent);
-
-      return {
-        id: nextId++,
-        content: trimmedContent,
-        label,
-        wordCount,
-        qualityScore,
-        createdAt: new Date()
-      };
-    });
-
-    samples.push(...newSamples);
-
-    res.status(201).json({
-      success: true,
-      data: {
-        importedCount: newSamples.length,
-        skippedCount: texts.length - validTexts.length,
-        samples: newSamples
-      },
-      message: `成功导入 ${newSamples.length} 条样本`
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: '服务器错误'
-    });
-  }
-});
+}));
 
 // 获取统计信息
-router.get('/stats', (req: Request, res: Response) => {
-  const normalSamples = samples.filter(s => s.label === 'normal');
-  const clickbaitSamples = samples.filter(s => s.label === 'clickbait');
+router.get('/stats', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const stats = fileStorage.getStats();
+  ApiResponseHelper.success(res, stats, '统计信息获取成功');
+}));
 
-  res.json({
-    success: true,
-    data: {
-      total: samples.length,
-      normalCount: normalSamples.length,
-      clickbaitCount: clickbaitSamples.length,
-      averageQuality: samples.length > 0 
-        ? samples.reduce((sum, s) => sum + s.qualityScore, 0) / samples.length 
-        : 0,
-      canTrain: normalSamples.length >= 3 && clickbaitSamples.length >= 3
-    }
-  });
-});
+// 导出所有数据为JSON
+router.get('/export', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const samples = fileStorage.getAllSamples();
+  const history = fileStorage.getAllTrainingHistory();
+  
+  const exportData = {
+    samples,
+    history,
+    exportedAt: new Date().toISOString(),
+    totalSamples: samples.length
+  };
 
-// 计算文本质量评分的简单算法
-function calculateQualityScore(content: string): number {
-  let score = 0;
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="news-classifier-data.json"');
+  res.send(JSON.stringify(exportData, null, 2));
+}));
 
-  // 基础长度评分
-  if (content.length >= 50) score += 0.4;
-  else if (content.length >= 20) score += 0.2;
+// 数据备份
+router.post('/backup', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const backup = fileStorage.createBackup();
+  ApiResponseHelper.success(res, backup, '数据备份创建成功');
+}));
 
-  // 标点符号评分
-  const punctuationCount = (content.match(/[。！？；：，]/g) || []).length;
-  if (punctuationCount >= 2) score += 0.2;
-
-  // 数字和具体信息评分
-  const numberCount = (content.match(/\d+/g) || []).length;
-  if (numberCount > 0) score += 0.1;
-
-  // 避免过度夸张词汇（针对标题党）
-  const exaggeratedWords = ['震惊', '重大发现', '不敢相信', '马上转发', '不转不是'];
-  const hasExaggeration = exaggeratedWords.some(word => content.includes(word));
-  if (hasExaggeration) score -= 0.3;
-
-  // 确保评分在0-1之间
-  return Math.max(0, Math.min(1, score));
-}
+// 健康检查
+router.get('/health', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const health = fileStorage.healthCheck();
+  
+  if (health.status === 'healthy') {
+    ApiResponseHelper.success(res, health.details, '存储系统健康');
+  } else {
+    ApiResponseHelper.serverError(res, '存储系统异常', health.details);
+  }
+}));
 
 export default router;

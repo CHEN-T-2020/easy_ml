@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-// 使用文件存储版本的路由
-import textSamplesRouter from './routes/textSamples-file';
+// 使用统一的文本样本路由
+import textSamplesRouter from './routes/textSamples';
 import modelComparisonRouter from './routes/modelComparison';
 
 dotenv.config();

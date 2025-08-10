@@ -1,5 +1,6 @@
 import { apiClient, ApiResponse } from './apiClient';
 
+// 类型定义从后端共享
 interface TextSample {
   id: number;
   content: string;

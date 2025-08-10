@@ -4,43 +4,37 @@ import { StateManager } from '../services/StateManager';
 import { TrainingMetrics, ApiResponse, PredictionResult } from '../types/common';
 import { asyncHandler, AppError, validateRequired, validateText } from '../middleware/errorHandler';
 import { validatePrediction, validateBatchPrediction } from '../middleware/validation';
+import { fileStorage } from '../database/FileStorage';
+import { ApiResponseHelper } from '../utils/ApiResponse';
 
 const router: Router = express.Router();
 const stateManager = StateManager.getInstance();
 
-// 导入共享的样本数据
-import { samples } from './textSamples';
-
 /**
  * 获取训练状态
  */
-router.get('/training/status', (req: Request, res: Response) => {
+router.get('/training/status', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const samples = fileStorage.getAllSamples();
   const progress = stateManager.getTrainingProgress();
-  const response: ApiResponse = {
-    success: true,
-    data: {
-      ...progress,
-      isModelTrained: progress.status === 'completed',
-      sampleCount: samples.length
-    }
-  };
-  res.json(response);
-});
+  
+  ApiResponseHelper.success(res, {
+    ...progress,
+    isModelTrained: progress.status === 'completed',
+    sampleCount: samples.length
+  }, '训练状态获取成功');
+}));
 
 /**
  * 开始训练模型
  */
-router.post('/training/start', async (req: Request, res: Response) => {
-  try {
-    console.log('收到训练请求');
-    
-    if (stateManager.isTrainingInProgress()) {
-      return res.status(400).json({
-        success: false,
-        message: '模型正在训练中，请稍后再试'
-      });
-    }
+router.post('/training/start', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  console.log('收到训练请求');
+  
+  if (stateManager.isTrainingInProgress()) {
+    return ApiResponseHelper.validationError(res, '模型正在训练中，请稍后再试');
+  }
 
+    const samples = fileStorage.getAllSamples();
     console.log('当前样本数量:', samples.length);
 
     const normalSamples = samples.filter(s => s.label === 'normal');
@@ -52,10 +46,7 @@ router.post('/training/start', async (req: Request, res: Response) => {
     // 使用统一的验证方法
     const validation = stateManager.validateTrainingData(normalSamples.length, clickbaitSamples.length);
     if (!validation.isValid) {
-      return res.status(400).json({
-        success: false,
-        message: validation.message
-      });
+      return ApiResponseHelper.validationError(res, validation.message || '训练数据验证失败');
     }
 
     // 开始模拟训练
@@ -67,12 +58,7 @@ router.post('/training/start', async (req: Request, res: Response) => {
       metrics: null
     });
 
-    const response: ApiResponse = {
-      success: true,
-      message: '训练已开始',
-      data: stateManager.getTrainingProgress()
-    };
-    res.json(response);
+    ApiResponseHelper.success(res, stateManager.getTrainingProgress(), '训练已开始');
 
     // 模拟异步训练过程
     setImmediate(async () => {
@@ -132,17 +118,7 @@ router.post('/training/start', async (req: Request, res: Response) => {
       }
     });
 
-  } catch (error) {
-    console.error('启动训练失败:', error);
-    stateManager.setTrainingInProgress(false);
-    const response: ApiResponse = {
-      success: false,
-      message: '启动训练失败',
-      error: error instanceof Error ? error.message : '未知错误'
-    };
-    res.status(500).json(response);
-  }
-});
+}));
 
 /**
  * 预测文本分类

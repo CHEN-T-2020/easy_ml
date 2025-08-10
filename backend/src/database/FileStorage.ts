@@ -1,14 +1,6 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-
-export interface TextSample {
-  id: number;
-  content: string;
-  label: 'normal' | 'clickbait';
-  wordCount: number;
-  qualityScore: number;
-  createdAt: string;
-}
+import { TextSample } from '../types/common';
 
 export interface TrainingHistory {
   id: number;
