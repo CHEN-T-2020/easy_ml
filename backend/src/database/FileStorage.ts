@@ -266,6 +266,58 @@ export class FileStorage {
     this.saveMetadata(metadata);
   }
 
+  // 加载预设训练数据
+  loadPresetTrainingData(): { success: boolean; message: string; count?: number } {
+    try {
+      const datasetPath = join(__dirname, '../../../data/datasets/training_100_samples.json');
+      
+      if (!existsSync(datasetPath)) {
+        return {
+          success: false,
+          message: '预设训练数据文件不存在'
+        };
+      }
+
+      const datasetContent = readFileSync(datasetPath, 'utf-8');
+      const dataset = JSON.parse(datasetContent);
+      
+      if (!dataset.samples || !Array.isArray(dataset.samples)) {
+        return {
+          success: false,
+          message: '预设训练数据格式无效'
+        };
+      }
+
+      // 转换数据格式
+      const samples: TextSample[] = dataset.samples.map((item: any, index: number) => ({
+        id: this.getNextId(this.getAllSamples()) + index,
+        content: item.content,
+        label: item.label,
+        wordCount: item.content.split(/\s+/).length,
+        qualityScore: item.qualityMetrics?.reliabilityScore || 0.5,
+        createdAt: new Date().toISOString()
+      }));
+
+      // 清空现有数据并加载新数据
+      this.clearAllSamples();
+      const currentSamples = this.getAllSamples();
+      currentSamples.push(...samples);
+      this.saveSamples(currentSamples);
+      
+      return {
+        success: true,
+        message: `成功加载 ${samples.length} 条预设训练数据`,
+        count: samples.length
+      };
+    } catch (error) {
+      console.error('加载预设训练数据失败:', error);
+      return {
+        success: false,
+        message: `加载预设训练数据失败: ${error instanceof Error ? error.message : '未知错误'}`
+      };
+    }
+  }
+
   private getNextId(items: { id: number }[]): number {
     if (!Array.isArray(items) || items.length === 0) return 1;
     

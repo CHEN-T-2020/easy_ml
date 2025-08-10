@@ -141,6 +141,17 @@ router.post('/backup', ApiResponseHelper.asyncHandler(async (req: Request, res: 
   ApiResponseHelper.success(res, backup, '数据备份创建成功');
 }));
 
+// 加载预设训练数据
+router.post('/load-preset', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const result = fileStorage.loadPresetTrainingData();
+  
+  if (result.success) {
+    ApiResponseHelper.success(res, { count: result.count }, result.message);
+  } else {
+    ApiResponseHelper.serverError(res, result.message);
+  }
+}));
+
 // 健康检查
 router.get('/health', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
   const health = fileStorage.healthCheck();

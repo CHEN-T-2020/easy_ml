@@ -1,4 +1,5 @@
 import { CorsOptions } from 'cors';
+import { Request } from 'express';
 
 // CORS 配置
 export const corsOptions: CorsOptions = {
@@ -37,13 +38,18 @@ export const corsOptions: CorsOptions = {
 // 请求速率限制配置
 export const rateLimitConfig = {
   windowMs: 15 * 60 * 1000, // 15分钟
-  max: 100, // 每个IP在窗口时间内最多100个请求
+  max: process.env.NODE_ENV === 'development' ? 1000 : 100, // 开发环境放宽限制
   message: {
     success: false,
     message: '请求过于频繁，请稍后再试',
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Heroku部署需要
+  skip: process.env.NODE_ENV === 'development' ? undefined : (req: Request) => {
+    // 在开发环境中可以选择跳过某些请求的限制
+    return false;
+  }
 };
 
 // 文件上传限制

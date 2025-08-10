@@ -8,17 +8,20 @@ import { errorHandler } from './middleware/errorHandler';
 import { corsOptions, rateLimitConfig, helmetConfig } from './config/security';
 // 统一的文本样本路由（基于文件存储）
 import textSamplesRouter from './routes/textSamples';
-// 临时禁用可能有问题的路由
-// import mlRouter from './routes/ml';
-// 临时禁用 modelComparison 路由
-// import modelComparisonRouter from './routes/modelComparison';
-// TODO: datasetManager需要重构后再启用
-// import datasetManagerRouter from './routes/datasetManager';
+// ML路由
+import mlRouter from './routes/ml';
+// 模型对比路由
+import modelComparisonRouter from './routes/modelComparison';
+// 数据集管理路由
+import datasetManagerRouter from './routes/datasetManager';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 启用信任代理（Heroku需要）
+app.set('trust proxy', 1);
 
 // 安全中间件
 app.use(helmet(helmetConfig));
@@ -30,10 +33,9 @@ app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // 路由
 app.use('/api/text-samples', textSamplesRouter);
-// app.use('/api/ml', mlRouter);
-// app.use('/api/model-comparison', modelComparisonRouter);
-// TODO: 启用数据集管理器
-// app.use('/api/data-manager', datasetManagerRouter);
+app.use('/api/ml', mlRouter);
+app.use('/api/model-comparison', modelComparisonRouter);
+app.use('/api/data-manager', datasetManagerRouter);
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({ message: '标题党识别平台 API 服务已启动' });
