@@ -744,23 +744,7 @@ export class CNNTextClassifier extends BaseClassifier {
    * 获取验证指标（用holdout方法）
    */
   private async getValidationMetrics(data: TrainingData[]): Promise<TrainingMetrics> {
-    // 简单分割：80%训练，20%验证
-    const shuffled = [...data].sort(() => Math.random() - 0.5);
-    const splitIndex = Math.floor(data.length * 0.8);
-    const validationData = shuffled.slice(splitIndex);
-    
-    if (validationData.length === 0) {
-      // 如果验证数据不足，返回训练集上的结果（但标记为较低准确率）
-      const metrics = this.evaluateOnData(this, data);
-      return {
-        ...metrics,
-        accuracy: metrics.accuracy * 0.80, // CNN容易过拟合
-        precision: metrics.precision * 0.80,
-        recall: metrics.recall * 0.80,
-        f1Score: metrics.f1Score * 0.80
-      };
-    }
-    
-    return this.evaluateOnData(this, validationData);
+    const { ModelUtils } = await import('../utils/ModelUtils');
+    return ModelUtils.getValidationMetrics(this, data, 0.80); // CNN容易过拟合
   }
 }

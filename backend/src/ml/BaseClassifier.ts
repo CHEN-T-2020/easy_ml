@@ -65,71 +65,24 @@ export abstract class BaseClassifier {
     visualData?: any;
   };
   
-  // 交叉验证评估
+  // 交叉验证评估 - 现在使用共享工具类
   async crossValidate(data: TrainingData[], folds: number = 5): Promise<TrainingMetrics[]> {
-    const foldSize = Math.floor(data.length / folds);
-    const results: TrainingMetrics[] = [];
-    
-    for (let i = 0; i < folds; i++) {
-      const testStart = i * foldSize;
-      const testEnd = i === folds - 1 ? data.length : (i + 1) * foldSize;
-      
-      const testData = data.slice(testStart, testEnd);
-      const trainData = [...data.slice(0, testStart), ...data.slice(testEnd)];
-      
-      // 训练临时模型
-      const tempClassifier = Object.create(Object.getPrototypeOf(this));
-      Object.assign(tempClassifier, this);
-      tempClassifier.reset();
-      
-      const metrics = await tempClassifier.train(trainData);
-      
-      // 在测试集上评估
-      const testMetrics = this.evaluateOnData(tempClassifier, testData);
-      results.push(testMetrics);
-    }
-    
-    return results;
+    const { ModelUtils } = await import('../utils/ModelUtils');
+    return ModelUtils.performCrossValidation(
+      () => {
+        const tempClassifier = Object.create(Object.getPrototypeOf(this));
+        Object.assign(tempClassifier, this);
+        tempClassifier.reset();
+        return tempClassifier;
+      },
+      data,
+      folds
+    );
   }
   
-  // 在数据集上评估模型
+  // 在数据集上评估模型 - 保留此方法供向后兼容
   protected evaluateOnData(classifier: BaseClassifier, testData: TrainingData[]): TrainingMetrics {
-    const startTime = Date.now();
-    let correct = 0;
-    let truePositives = 0;
-    let falsePositives = 0;
-    let falseNegatives = 0;
-    
-    for (const sample of testData) {
-      const result = classifier.predict(sample.text);
-      const predicted = result.prediction;
-      const actual = sample.label;
-      
-      if (predicted === actual) {
-        correct++;
-      }
-      
-      if (predicted === 'clickbait' && actual === 'clickbait') {
-        truePositives++;
-      } else if (predicted === 'clickbait' && actual === 'normal') {
-        falsePositives++;
-      } else if (predicted === 'normal' && actual === 'clickbait') {
-        falseNegatives++;
-      }
-    }
-    
-    const accuracy = correct / testData.length;
-    const precision = truePositives / (truePositives + falsePositives) || 0;
-    const recall = truePositives / (truePositives + falseNegatives) || 0;
-    const f1Score = 2 * (precision * recall) / (precision + recall) || 0;
-    const trainingTime = Date.now() - startTime;
-    
-    return {
-      accuracy,
-      precision,
-      recall,
-      f1Score,
-      trainingTime
-    };
+    const { ModelUtils } = require('../utils/ModelUtils');
+    return ModelUtils.evaluateOnData(classifier, testData);
   }
 }

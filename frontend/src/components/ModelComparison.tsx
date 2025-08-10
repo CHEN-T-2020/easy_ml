@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useComparisonState } from '../utils/stateManager';
 import './styles.css';
 
 interface ModelInfo {
@@ -62,47 +63,24 @@ interface ComparisonSummary {
 }
 
 const ModelComparison: React.FC = () => {
-  const [models, setModels] = useState<{[key: string]: ModelInfo}>(() => {
-    const saved = localStorage.getItem('comparison_models');
-    return saved ? JSON.parse(saved) : {};
-  });
-  const [comparisonResults, setComparisonResults] = useState<ModelComparisonResult[]>(() => {
-    const saved = localStorage.getItem('comparison_results');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [summary, setSummary] = useState<ComparisonSummary | null>(() => {
-    const saved = localStorage.getItem('comparison_summary');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [testText, setTestText] = useState(() => {
-    return localStorage.getItem('comparison_testText') || '';
-  });
+  const {
+    models,
+    results: comparisonResults,
+    // summary, // 暂时不用
+    testText,
+    trainingStatus,
+    updateState,
+    // clearResults // 暂时不用
+  } = useComparisonState();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [trainingStatus, setTrainingStatus] = useState<{[key: string]: boolean}>(() => {
-    const saved = localStorage.getItem('comparison_trainingStatus');
-    return saved ? JSON.parse(saved) : {};
-  });
 
-  // 保存状态到localStorage
-  useEffect(() => {
-    localStorage.setItem('comparison_models', JSON.stringify(models));
-  }, [models]);
-
-  useEffect(() => {
-    localStorage.setItem('comparison_results', JSON.stringify(comparisonResults));
-  }, [comparisonResults]);
-
-  useEffect(() => {
-    localStorage.setItem('comparison_summary', JSON.stringify(summary));
-  }, [summary]);
-
-  useEffect(() => {
-    localStorage.setItem('comparison_testText', testText);
-  }, [testText]);
-
-  useEffect(() => {
-    localStorage.setItem('comparison_trainingStatus', JSON.stringify(trainingStatus));
-  }, [trainingStatus]);
+  // 便捷更新函数
+  const setModels = (newModels: {[key: string]: ModelInfo}) => updateState({ models: newModels });
+  const setComparisonResults = (results: ModelComparisonResult[]) => updateState({ results });
+  const setSummary = (newSummary: ComparisonSummary | null) => updateState({ summary: newSummary });
+  const setTestText = (text: string) => updateState({ testText: text });
+  const setTrainingStatus = (status: {[key: string]: boolean}) => updateState({ trainingStatus: status });
 
   // 获取模型信息
   useEffect(() => {
@@ -277,7 +255,7 @@ const ModelComparison: React.FC = () => {
               <div className="advantages">
                 <h4>✅ 优势</h4>
                 <ul>
-                  {info.advantages.slice(0, 2).map((advantage, index) => (
+                  {info.advantages.slice(0, 2).map((advantage: string, index: number) => (
                     <li key={index}>{advantage}</li>
                   ))}
                 </ul>
@@ -286,7 +264,7 @@ const ModelComparison: React.FC = () => {
               <div className="disadvantages">
                 <h4>❌ 劣势</h4>
                 <ul>
-                  {info.disadvantages.slice(0, 2).map((disadvantage, index) => (
+                  {info.disadvantages.slice(0, 2).map((disadvantage: string, index: number) => (
                     <li key={index}>{disadvantage}</li>
                   ))}
                 </ul>
@@ -408,7 +386,7 @@ const ModelComparison: React.FC = () => {
                     <div className="reasoning">
                       <h5>推理过程</h5>
                       <ul>
-                        {result.prediction.reasoning.map((reason, index) => (
+                        {result.prediction.reasoning.map((reason: string, index: number) => (
                           <li key={index}>{reason}</li>
                         ))}
                       </ul>
