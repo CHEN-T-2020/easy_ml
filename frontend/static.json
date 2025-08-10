@@ -1,0 +1,16 @@
+{
+  "root": "build/",
+  "clean_urls": false,
+  "routes": {
+    "/**": "index.html"
+  },
+  "headers": {
+    "/**": {
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "/static/**": {
+      "Cache-Control": "public, max-age=31536000"
+    }
+  }
+}

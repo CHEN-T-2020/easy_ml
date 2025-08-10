@@ -3,7 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import textSamplesRouter from './routes/textSamples';
+// 使用文件存储版本的路由
+import textSamplesRouter from './routes/textSamples-file';
 import mlRouter from './routes/ml';
 import modelComparisonRouter from './routes/modelComparison';
 import datasetManagerRouter from './routes/datasetManager';

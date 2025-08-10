@@ -21,7 +21,7 @@ export class DatabaseConnection {
       });
 
       // Handle pool errors
-      DatabaseConnection.pool.on('error', (err) => {
+      DatabaseConnection.pool.on('error', (err: Error) => {
         console.error('Unexpected error on idle client', err);
       });
     }
