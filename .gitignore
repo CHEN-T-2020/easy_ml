@@ -1,102 +1,174 @@
-# 依赖包
+# ================================
+# Node.js & 依赖包
+# ================================
 node_modules/
 */node_modules/
+.npm
+.yarn-integrity
+jspm_packages/
+package-lock.json.bak
 
-# 构建输出
-frontend/build/
+# ================================
+# 构建输出 & 缓存
+# ================================
+# 后端构建
 backend/dist/
+backend/build/
 
-# 环境变量
+# 前端构建
+frontend/build/
+frontend/dist/
+
+# 缓存目录
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_*/
+.next/
+.nuxt/
+.vuepress/dist/
+.fusebox/
+
+# ================================
+# 环境变量 & 配置
+# ================================
+# 环境变量文件
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+.env.production
+.env.staging
 
+# 但保留示例配置文件
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# ================================
+# 日志 & 运行时文件
+# ================================
 # 日志文件
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
+server.log*
 
 # 运行时文件
 *.pid
 *.seed
 *.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
 .node_repl_history
 
-# Output of 'npm pack'
-*.tgz
+# ================================
+# 测试 & 覆盖率
+# ================================
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
 
-# Yarn Integrity file
-.yarn-integrity
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# next.js build output
-.next
-
-# nuxt.js build output
-.nuxt
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless/
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
+# ================================
+# 数据库 & 存储
+# ================================
+# 数据库文件
+*.sqlite
+*.sqlite3
+*.db
 .dynamodb/
 
-# IDE
+# 持久化数据（根据项目需要调整）
+# data/persistent/*.json
+# 注释掉以保持持久化数据，但可以根据需要启用
+
+# ================================
+# IDE & 编辑器
+# ================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
 
-# OS
+# ================================
+# 操作系统
+# ================================
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
+
+# Windows
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# 数据库文件
-*.sqlite
-*.db
+# Linux
+.Trash-*
 
-# 临时文件
+# ================================
+# 部署相关
+# ================================
+.serverless/
+.vercel/
+.netlify/
+
+# Docker
+.dockerignore.bak
+
+# ================================
+# 临时文件 & 备份
+# ================================
 *.tmp
 *.temp
+*.bak
+*.backup
+*~
+.#*
 
-# 示例文件（可选，保留作为使用示例）
-demo_*.txt
+# ================================
+# 机器学习模型文件
+# ================================
+# 大型模型文件
+*.model
+*.h5
+*.pkl
+*.joblib
+models/*.bin
+models/*.onnx
+
+# 训练临时文件
+checkpoints/
+logs/training/
+
+# ================================
+# 开发工具
+# ================================
+.eslintcache
+.tsbuildinfo
+
+# Bundle analyzer
+bundle-analyzer-report.html
+
+# Coverage reports
+lcov-report/
+
+# ================================
+# 项目特定
+# ================================
+# 导出数据（通常不需要版本控制）
+data/exports/*.csv
+data/exports/*.json
+data/exports/*.xlsx
+
+# 临时上传文件
+uploads/temp/
+
+# 测试数据（如果很大的话）
+# data/test/*.json
