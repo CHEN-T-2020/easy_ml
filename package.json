@@ -1,0 +1,20 @@
+{
+  "name": "news-classifier-platform",
+  "version": "1.0.0",
+  "description": "News Classifier Platform - Backend API",
+  "main": "backend/dist/index.js",
+  "scripts": {
+    "build": "cd backend && npm install && npm run build",
+    "start": "cd backend && npm start",
+    "heroku-postbuild": "cd backend && npm install && npm run build"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": ["news", "classifier", "ml", "api"],
+  "author": "",
+  "license": "ISC"
+}
