@@ -47,7 +47,7 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use(errorHandler);
 
 // 404 处理
-app.use('*', (req: Request, res: Response) => {
+app.all('*', (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: `路由 ${req.originalUrl} 不存在`
