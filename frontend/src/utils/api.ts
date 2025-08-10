@@ -49,6 +49,14 @@ export const api = {
     return apiClient.get('/text-samples/stats');
   },
 
+  // 清除所有样本数据
+  clearAllSamples: async (): Promise<ApiResponse<{
+    clearedCount: number;
+    currentCount: number;
+  }>> => {
+    return apiClient.delete('/text-samples/clear');
+  },
+
   // 数据集管理API
   dataManager: {
     // 获取训练数据集信息
@@ -107,6 +115,11 @@ export const api = {
     // 预测文本
     predict: async (text: string) => {
       return apiClient.post('/model-comparison/predict', { text });
+    },
+
+    // 重置所有模型
+    resetModels: async () => {
+      return apiClient.post('/model-comparison/reset', {});
     }
   },
 };

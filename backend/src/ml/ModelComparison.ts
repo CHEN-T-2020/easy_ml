@@ -5,11 +5,10 @@ import {
   TrainingMetrics, 
   ModelInfo 
 } from './BaseClassifier';
-import { ClickbaitClassifier } from './ClickbaitClassifier';
 import { RandomForestClassifier } from './RandomForestClassifier';
 import { CNNTextClassifier } from './CNNTextClassifier';
 
-export type ModelType = 'naive_bayes' | 'random_forest' | 'cnn';
+export type ModelType = 'random_forest' | 'cnn';
 
 export interface ModelComparisonResult {
   modelType: ModelType;
@@ -66,7 +65,6 @@ export class ModelComparison {
   }
 
   private initializeModels(): void {
-    this.models.set('naive_bayes', new ClickbaitClassifier());
     this.models.set('random_forest', new RandomForestClassifier());
     this.models.set('cnn', new CNNTextClassifier());
 
@@ -151,8 +149,8 @@ export class ModelComparison {
   async trainAllModels(trainingData: TrainingData[]): Promise<Map<ModelType, TrainingMetrics>> {
     const results = new Map<ModelType, TrainingMetrics>();
     
-    // 按复杂度顺序训练：朴素贝叶斯 -> 随机森林 -> CNN
-    const modelOrder: ModelType[] = ['naive_bayes', 'random_forest', 'cnn'];
+    // 按复杂度顺序训练：随机森林 -> CNN
+    const modelOrder: ModelType[] = ['random_forest', 'cnn'];
     
     for (const modelType of modelOrder) {
       try {
@@ -268,7 +266,7 @@ export class ModelComparison {
     const allMetrics = Array.from(this.metrics.entries());
     
     // 找出最佳准确率
-    let bestAccuracy = { modelType: 'naive_bayes' as ModelType, accuracy: 0 };
+    let bestAccuracy = { modelType: 'random_forest' as ModelType, accuracy: 0 };
     for (const [modelType, metrics] of allMetrics) {
       if (metrics.accuracy > bestAccuracy.accuracy) {
         bestAccuracy = { modelType, accuracy: metrics.accuracy };
@@ -276,7 +274,7 @@ export class ModelComparison {
     }
     
     // 找出最快训练时间
-    let fastestTraining = { modelType: 'naive_bayes' as ModelType, trainingTime: Infinity };
+    let fastestTraining = { modelType: 'random_forest' as ModelType, trainingTime: Infinity };
     for (const [modelType, metrics] of allMetrics) {
       if (metrics.trainingTime < fastestTraining.trainingTime) {
         fastestTraining = { modelType, trainingTime: metrics.trainingTime };
@@ -284,7 +282,7 @@ export class ModelComparison {
     }
     
     // 找出最快预测时间
-    let fastestPrediction = { modelType: 'naive_bayes' as ModelType, processingTime: Infinity };
+    let fastestPrediction = { modelType: 'random_forest' as ModelType, processingTime: Infinity };
     if (text) {
       const predictions = this.predictWithAllModels(text);
       for (const [modelType, prediction] of predictions) {

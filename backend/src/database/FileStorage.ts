@@ -73,7 +73,14 @@ export class FileStorage {
   getAllSamples(): TextSample[] {
     try {
       const data = readFileSync(this.samplesFile, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      // 确保返回的是数组
+      if (Array.isArray(parsed)) {
+        return parsed;
+      } else {
+        console.warn('样本文件数据格式错误，期望数组但获得:', typeof parsed);
+        return [];
+      }
     } catch (error) {
       console.error('读取样本文件失败:', error);
       return [];
@@ -127,11 +134,28 @@ export class FileStorage {
     return this.getAllSamples().find(s => s.id === id);
   }
 
+  clearAllSamples(): boolean {
+    try {
+      this.saveSamples([]);
+      return true;
+    } catch (error) {
+      console.error('清除所有样本失败:', error);
+      return false;
+    }
+  }
+
   // 训练历史管理
   getAllTrainingHistory(): TrainingHistory[] {
     try {
       const data = readFileSync(this.historyFile, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      // 确保返回的是数组
+      if (Array.isArray(parsed)) {
+        return parsed;
+      } else {
+        console.warn('训练历史文件数据格式错误，期望数组但获得:', typeof parsed);
+        return [];
+      }
     } catch (error) {
       console.error('读取训练历史失败:', error);
       return [];
@@ -251,8 +275,15 @@ export class FileStorage {
   }
 
   private getNextId(items: { id: number }[]): number {
-    if (items.length === 0) return 1;
-    return Math.max(...items.map(item => item.id)) + 1;
+    if (!Array.isArray(items) || items.length === 0) return 1;
+    
+    // 过滤出有效的ID值
+    const validIds = items
+      .map(item => item?.id)
+      .filter(id => typeof id === 'number' && !isNaN(id));
+    
+    if (validIds.length === 0) return 1;
+    return Math.max(...validIds) + 1;
   }
 }
 

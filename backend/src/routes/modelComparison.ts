@@ -42,7 +42,7 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
   try {
     const modelType = req.params.modelType as ModelType;
     
-    if (!['naive_bayes', 'random_forest', 'cnn'].includes(modelType)) {
+    if (!['random_forest', 'cnn'].includes(modelType)) {
       return res.status(400).json({
         success: false,
         message: '无效的模型类型'
@@ -379,7 +379,7 @@ router.post('/reset', (req: Request, res: Response) => {
   try {
     const { modelType } = req.body;
     
-    if (modelType && ['naive_bayes', 'random_forest', 'cnn'].includes(modelType)) {
+    if (modelType && ['random_forest', 'cnn'].includes(modelType)) {
       modelComparison.resetModel(modelType as ModelType);
       res.json({
         success: true,

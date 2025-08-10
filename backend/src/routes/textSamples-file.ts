@@ -74,6 +74,24 @@ router.post('/batch', ApiResponseHelper.asyncHandler(async (req: Request, res: R
   }, `成功导入 ${addedSamples.length} 个样本`);
 }));
 
+// 清除所有样本数据 (必须放在 /:id 路由之前)
+router.delete('/clear', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
+  const stats = fileStorage.getStats();
+  const originalCount = stats.total;
+  
+  // 清空所有样本数据
+  const cleared = fileStorage.clearAllSamples();
+  
+  if (cleared) {
+    ApiResponseHelper.success(res, {
+      clearedCount: originalCount,
+      currentCount: 0
+    }, `已清除${originalCount}条文本样本，数据库已重置`);
+  } else {
+    ApiResponseHelper.serverError(res, '清除文本样本失败');
+  }
+}));
+
 // 删除样本
 router.delete('/:id', ApiResponseHelper.asyncHandler(async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
