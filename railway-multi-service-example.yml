@@ -1,0 +1,47 @@
+# Railway 多服务项目配置示例
+# 一个 Railway 项目可以包含多个服务
+
+# 项目结构:
+# my-apps/
+# ├── news-classifier/     # 服务1
+# ├── blog-platform/       # 服务2  
+# ├── todo-app/            # 服务3
+# └── railway.json
+
+# railway.json 配置:
+{
+  "services": {
+    "news-classifier": {
+      "source": "./news-classifier",
+      "build": "npm run build",
+      "start": "node dist/index.js",
+      "variables": {
+        "PORT": 3001,
+        "APP_NAME": "news-classifier"
+      }
+    },
+    "blog-platform": {
+      "source": "./blog-platform", 
+      "build": "npm run build",
+      "start": "node dist/server.js",
+      "variables": {
+        "PORT": 3002,
+        "APP_NAME": "blog-platform"
+      }
+    },
+    "todo-app": {
+      "source": "./todo-app",
+      "build": "npm run build", 
+      "start": "node dist/app.js",
+      "variables": {
+        "PORT": 3003,
+        "APP_NAME": "todo-app"
+      }
+    },
+    "postgres": {
+      "type": "postgresql"
+    }
+  }
+}
+
+# 成本: 仅 $5/月 运行 3个应用 + 1个共享数据库

@@ -29,7 +29,7 @@ class ApiClient {
   private defaultHeaders: Record<string, string>;
 
   constructor(config: ApiConfig = {}) {
-    this.baseUrl = config.baseUrl || 'http://localhost:3001/api';
+    this.baseUrl = config.baseUrl || process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
     this.timeout = config.timeout || 30000;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
