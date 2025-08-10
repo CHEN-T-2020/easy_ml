@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { Router } from 'express';
 import { ModelComparison, ModelType } from '../ml/ModelComparison';
-import { samples } from './textSamples';
+import { fileStorage } from '../database/FileStorage';
 
 const router: Router = express.Router();
 
@@ -23,7 +23,7 @@ router.get('/models', (req: Request, res: Response) => {
         models: modelsInfo,
         trainedModels,
         trainingStatus,
-        totalSamples: samples.length
+        totalSamples: fileStorage.getAllSamples().length
       }
     });
   } catch (error) {
@@ -49,6 +49,7 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
       });
     }
 
+    const samples = fileStorage.getAllSamples();
     if (samples.length < 4) {
       return res.status(400).json({
         success: false,
@@ -106,6 +107,7 @@ router.post('/models/:modelType/train', async (req: Request, res: Response) => {
  */
 router.post('/models/train-all', async (req: Request, res: Response) => {
   try {
+    const samples = fileStorage.getAllSamples();
     if (samples.length < 10) {
       return res.status(400).json({
         success: false,
@@ -192,7 +194,7 @@ router.get('/training/status', (req: Request, res: Response) => {
         trainedModels,
         progress,
         isAnyTraining: modelComparison.isAnyModelTraining(),
-        totalSamples: samples.length
+        totalSamples: fileStorage.getAllSamples().length
       }
     });
   } catch (error) {
@@ -323,6 +325,7 @@ router.post('/cross-validation', async (req: Request, res: Response) => {
   try {
     const { folds = 5 } = req.body;
     
+    const samples = fileStorage.getAllSamples();
     if (samples.length < 10) {
       return res.status(400).json({
         success: false,
