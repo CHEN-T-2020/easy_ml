@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 // 使用文件存储版本的路由
 import textSamplesRouter from './routes/textSamples-file';
+import modelComparisonRouter from './routes/modelComparison';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // 路由
 app.use('/api/text-samples', textSamplesRouter);
+app.use('/api/model-comparison', modelComparisonRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: '标题党识别平台 API 服务已启动' });
