@@ -3,15 +3,21 @@ import { CorsOptions } from 'cors';
 // CORS 配置
 export const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
+    // 如果设置了 CORS_ORIGIN 环境变量为 "*"，允许所有来源（用于演示）
+    if (process.env.CORS_ORIGIN === '*') {
+      return callback(null, true);
+    }
+
     // 允许的域名白名单
     const allowedOrigins = [
       'http://localhost:3000', // 开发环境前端
       'http://127.0.0.1:3000',
       process.env.FRONTEND_URL, // 生产环境前端
+      process.env.CORS_ORIGIN, // 环境变量指定的来源
     ].filter(Boolean); // 过滤掉 undefined
 
-    // 在开发环境中，允许没有 origin 的请求（如 Postman）
-    if (process.env.NODE_ENV === 'development' && !origin) {
+    // 在开发环境或没有 origin 的请求（如直接API访问、Postman）
+    if (!origin) {
       return callback(null, true);
     }
 
