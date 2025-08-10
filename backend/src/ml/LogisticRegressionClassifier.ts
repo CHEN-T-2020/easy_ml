@@ -30,7 +30,7 @@ export class LogisticRegressionClassifier extends BaseClassifier {
   getModelInfo(): ModelInfo {
     return {
       name: '逻辑回归分类器',
-      type: 'statistical',
+      type: 'traditional',
       description: '基于逻辑回归的线性分类模型，使用文本特征进行分类',
       advantages: [
         '训练速度快',
@@ -242,15 +242,15 @@ export class LogisticRegressionClassifier extends BaseClassifier {
       text.length,
       textFeatures.wordCount,
       textFeatures.sentenceCount,
-      textFeatures.avgWordsPerSentence,
+      textFeatures.averageWordLength,
       textFeatures.exclamationCount,
       textFeatures.questionCount,
-      textFeatures.capitalRatio,
-      textFeatures.digitRatio,
+      textFeatures.capsRatio,
+      0,
       textFeatures.punctuationRatio,
       textFeatures.clickbaitWords,
       textFeatures.emotionalWords,
-      textFeatures.superlativeCount
+      0
     );
 
     // 词频特征 (简化版TF-IDF)
@@ -332,9 +332,9 @@ export class LogisticRegressionClassifier extends BaseClassifier {
   // 获取特征名称
   private getFeatureNames(): string[] {
     return [
-      'text_length', 'word_count', 'sentence_count', 'avg_words_per_sentence',
-      'exclamation_count', 'question_count', 'capital_ratio', 'digit_ratio',
-      'punctuation_ratio', 'clickbait_words', 'emotional_words', 'superlative_count',
+      'text_length', 'word_count', 'sentence_count', 'average_word_length',
+      'exclamation_count', 'question_count', 'caps_ratio', 'placeholder1',
+      'punctuation_ratio', 'clickbait_words', 'emotional_words', 'placeholder2',
       'word_frequency', 'chinese_char_ratio', 'special_char_ratio'
     ];
   }
@@ -480,12 +480,12 @@ export class LogisticRegressionClassifier extends BaseClassifier {
       reasoning.push(`包含${features.clickbaitWords}个标题党关键词`);
     }
     
-    if (features.capitalRatio > 0.3) {
-      reasoning.push(`大写字母比例较高(${(features.capitalRatio * 100).toFixed(1)}%)`);
+    if (features.capsRatio > 0.3) {
+      reasoning.push(`大写字母比例较高(${(features.capsRatio * 100).toFixed(1)}%)`);
     }
     
-    if (features.superlativeCount > 0) {
-      reasoning.push(`包含${features.superlativeCount}个极端词汇`);
+    if (features.urgencyWords > 0) {
+      reasoning.push(`包含${features.urgencyWords}个紧急词汇`);
     }
     
     return reasoning;
