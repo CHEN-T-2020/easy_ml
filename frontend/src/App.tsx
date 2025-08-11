@@ -6,6 +6,7 @@ import { FileUpload } from './components/FileUpload';
 import ModelComparison from './components/ModelComparison';
 import { api } from './utils/api';
 import { stateManager } from './utils/stateManager';
+import { DataProvider, useDataContext } from './contexts/DataContext';
 
 interface TextSample {
   id: number;
@@ -14,7 +15,10 @@ interface TextSample {
 }
 
 
-function App() {
+function AppContent() {
+  // 使用全局数据上下文
+  const { triggerDataChange, updateSampleCount } = useDataContext();
+  
   // 从localStorage恢复状态
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = localStorage.getItem('app_currentStep');
@@ -82,6 +86,10 @@ function App() {
           label: sample.label
         }));
         setSamples(fetchedSamples);
+        
+        // 🆕 更新全局样本数量
+        updateSampleCount(fetchedSamples.length);
+        console.log('📊 更新全局样本数量:', fetchedSamples.length);
       }
     } catch (error) {
       console.error('获取样本失败:', error);
@@ -101,6 +109,9 @@ function App() {
       if (response.success && response.data) {
         // 重新获取最新的样本数据
         await fetchSamples();
+        
+        // 🆕 触发全局数据变更事件
+        triggerDataChange('SAMPLE_ADDED', { sample: response.data, label });
         
         if (label === 'normal') {
           setNormalNewsText('');
@@ -131,6 +142,9 @@ function App() {
       if (response.success) {
         // 重新获取最新的样本数据
         await fetchSamples();
+        
+        // 🆕 触发全局数据变更事件
+        triggerDataChange('SAMPLE_DELETED', { sampleId: id });
       }
     } catch (error) {
       console.error('删除样本失败:', error);
@@ -338,6 +352,15 @@ function App() {
         )}
       </div>
     </div>
+  );
+}
+
+// 包装App组件，提供全局数据上下文
+function App() {
+  return (
+    <DataProvider>
+      <AppContent />
+    </DataProvider>
   );
 }
 

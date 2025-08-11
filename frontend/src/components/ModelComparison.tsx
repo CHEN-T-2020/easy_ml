@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useComparisonState } from '../utils/stateManager';
+import { useDataContext, useDataListener } from '../contexts/DataContext';
 import './styles.css';
 
 interface ModelInfo {
@@ -113,15 +114,51 @@ const ModelComparison: React.FC = () => {
   const setTestText = (text: string) => updateState({ testText: text });
   const setTrainingStatus = (status: {[key: string]: boolean}) => updateState({ trainingStatus: status });
   
-  // 添加当前样本数量状态
-  const [currentSampleCount, setCurrentSampleCount] = React.useState<number>(0);
+  // 🆕 使用全局数据上下文
+  const { sampleCount } = useDataContext();
 
-  // 获取模型信息
+  // 🆕 监听数据变更事件，实现精确更新
+  useDataListener((event, data) => {
+    console.log('📡 ModelComparison收到数据变更事件:', event, data);
+    
+    // 根据不同事件类型进行相应的更新
+    switch (event) {
+      case 'SAMPLE_ADDED':
+      case 'SAMPLE_DELETED':
+      case 'SAMPLES_CLEARED':
+        // 样本数据变更时，更新训练状态（检查是否有新的样本数量）
+        fetchTrainingStatus();
+        break;
+      case 'SAMPLES_BATCH_ADDED':
+        fetchTrainingStatus();
+        break;
+    }
+  });
+
+  // 获取模型信息（仅在组件挂载时）
   useEffect(() => {
+    console.log('🔄 初始化ModelComparison组件...');
     fetchModelsInfo();
-    const interval = setInterval(fetchTrainingStatus, 1000); // 每秒更新训练状态
-    return () => clearInterval(interval);
+    fetchTrainingStatus();
   }, []);
+
+  // 🆕 监听训练状态变化（仅当有模型正在训练时才定期检查）
+  useEffect(() => {
+    const isAnyTraining = Object.values(trainingStatus).some(status => status);
+    
+    if (isAnyTraining) {
+      console.log('⚡ 有模型正在训练，启动状态监控...');
+      const interval = setInterval(() => {
+        fetchTrainingStatus();
+        fetchComparisonResults();
+      }, 2000); // 只在训练时才2秒检查一次
+      
+      return () => {
+        console.log('⚡ 训练完成，停止状态监控');
+        clearInterval(interval);
+      };
+    }
+  }, [trainingStatus]); // 依赖训练状态
 
   const fetchModelsInfo = async () => {
     try {
@@ -130,8 +167,8 @@ const ModelComparison: React.FC = () => {
       if (data.success) {
         setModels(data.data.models);
         setTrainingStatus(data.data.trainingStatus);
-        // 获取当前实时样本数量
-        setCurrentSampleCount(data.data.totalSamples || 0);
+        // 注释掉：不再需要本地状态，使用全局状态
+        // setCurrentSampleCount(data.data.totalSamples || 0);
       }
     } catch (error) {
       console.error('获取模型信息失败:', error);
@@ -144,8 +181,8 @@ const ModelComparison: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         setTrainingStatus(data.data.trainingStatus);
-        // 实时更新当前样本数量
-        setCurrentSampleCount(data.data.totalSamples || 0);
+        // 注释掉：不再需要重复更新，使用全局状态
+        // setCurrentSampleCount(data.data.totalSamples || 0);
         
         // 如果有训练中的模型，获取对比结果以更新进度
         if (data.data.isAnyTraining) {
@@ -330,9 +367,9 @@ const ModelComparison: React.FC = () => {
 
       {/* 训练控制 */}
       <div className="training-controls">
-        {currentSampleCount > 0 && (
+        {sampleCount > 0 && (
           <div style={{textAlign: 'center', marginBottom: '15px', color: '#666', fontSize: '0.9rem'}}>
-            💾 当前数据库中有 <strong>{currentSampleCount}</strong> 个样本可用于训练
+            💾 当前数据库中有 <strong>{sampleCount}</strong> 个样本可用于训练
           </div>
         )}
         <button 
@@ -414,7 +451,7 @@ const ModelComparison: React.FC = () => {
                         <h5>📊 数据集信息</h5>
                         <div className="dataset-stats">
                           <span style={{backgroundColor: '#e3f2fd', color: '#1976d2'}}>
-                            🔄 当前样本: {currentSampleCount}
+                            🔄 当前样本: {sampleCount}
                           </span>
                           {result.metrics.datasetInfo && (
                             <>
