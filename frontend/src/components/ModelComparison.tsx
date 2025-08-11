@@ -52,7 +52,7 @@ interface TrainingMetrics {
 }
 
 interface ClassificationResult {
-  prediction: 'real' | 'fake';
+  prediction: 'normal' | 'clickbait';
   confidence: number;
   reasoning: string[];
   processingTime?: number;
@@ -88,7 +88,7 @@ interface ComparisonSummary {
     processingTime: number;
   };
   consensusPrediction?: {
-    prediction: 'real' | 'fake';
+    prediction: 'normal' | 'clickbait';
     confidence: number;
     agreement: number;
   };
@@ -112,6 +112,9 @@ const ModelComparison: React.FC = () => {
   const setSummary = (newSummary: ComparisonSummary | null) => updateState({ summary: newSummary });
   const setTestText = (text: string) => updateState({ testText: text });
   const setTrainingStatus = (status: {[key: string]: boolean}) => updateState({ trainingStatus: status });
+  
+  // 添加当前样本数量状态
+  const [currentSampleCount, setCurrentSampleCount] = React.useState<number>(0);
 
   // 获取模型信息
   useEffect(() => {
@@ -127,6 +130,8 @@ const ModelComparison: React.FC = () => {
       if (data.success) {
         setModels(data.data.models);
         setTrainingStatus(data.data.trainingStatus);
+        // 获取当前实时样本数量
+        setCurrentSampleCount(data.data.totalSamples || 0);
       }
     } catch (error) {
       console.error('获取模型信息失败:', error);
@@ -139,6 +144,8 @@ const ModelComparison: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         setTrainingStatus(data.data.trainingStatus);
+        // 实时更新当前样本数量
+        setCurrentSampleCount(data.data.totalSamples || 0);
         
         // 如果有训练中的模型，获取对比结果以更新进度
         if (data.data.isAnyTraining) {
@@ -323,6 +330,11 @@ const ModelComparison: React.FC = () => {
 
       {/* 训练控制 */}
       <div className="training-controls">
+        {currentSampleCount > 0 && (
+          <div style={{textAlign: 'center', marginBottom: '15px', color: '#666', fontSize: '0.9rem'}}>
+            💾 当前数据库中有 <strong>{currentSampleCount}</strong> 个样本可用于训练
+          </div>
+        )}
         <button 
           onClick={() => trainModel('all')}
           disabled={isLoading || Object.values(trainingStatus).some(status => status)}
@@ -389,7 +401,7 @@ const ModelComparison: React.FC = () => {
                   <>
                     <div className="prediction-result">
                       <div className={`prediction-label ${result.prediction.prediction}`}>
-                        {result.prediction.prediction === 'fake' ? '标题党' : '正常标题'}
+                        {result.prediction.prediction === 'clickbait' ? '标题党' : '正常标题'}
                       </div>
                       <div className="confidence">
                         置信度: {result.prediction.confidence}%
@@ -398,17 +410,22 @@ const ModelComparison: React.FC = () => {
                     
                     <div className="metrics">
                       {/* 数据集信息 */}
-                      {result.metrics.datasetInfo && (
-                        <div className="dataset-info">
-                          <h5>📊 数据集信息</h5>
-                          <div className="dataset-stats">
-                            <span>总样本: {result.metrics.datasetInfo.totalSamples}</span>
-                            <span>训练集: {result.metrics.datasetInfo.trainSize}</span>
-                            <span>测试集: {result.metrics.datasetInfo.testSize}</span>
-                            <span>分割比例: {Math.round((1-result.metrics.datasetInfo.splitRatio)*100)}%/{Math.round(result.metrics.datasetInfo.splitRatio*100)}%</span>
-                          </div>
+                      <div className="dataset-info">
+                        <h5>📊 数据集信息</h5>
+                        <div className="dataset-stats">
+                          <span style={{backgroundColor: '#e3f2fd', color: '#1976d2'}}>
+                            🔄 当前样本: {currentSampleCount}
+                          </span>
+                          {result.metrics.datasetInfo && (
+                            <>
+                              <span>上次训练: {result.metrics.datasetInfo.totalSamples}</span>
+                              <span>训练集: {result.metrics.datasetInfo.trainSize}</span>
+                              <span>测试集: {result.metrics.datasetInfo.testSize}</span>
+                              <span>分割比例: {Math.round((1-result.metrics.datasetInfo.splitRatio)*100)}%/{Math.round(result.metrics.datasetInfo.splitRatio*100)}%</span>
+                            </>
+                          )}
                         </div>
-                      )}
+                      </div>
                       
                       {/* 性能指标对比 */}
                       <div className="performance-comparison">
